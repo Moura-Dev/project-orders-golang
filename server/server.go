@@ -2,9 +2,11 @@ package server
 
 import (
 	"base-project-api/server/routes"
-	"log"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
+	"os"
+	"time"
 )
 
 type Server struct {
@@ -14,7 +16,7 @@ type Server struct {
 
 func NewServer() Server {
 	return Server{
-		port:   "5000",
+		port:   os.Getenv("PORT"),
 		server: gin.Default(),
 	}
 }
@@ -22,6 +24,23 @@ func NewServer() Server {
 func (s *Server) Run() {
 	router := routes.ConfigRoutes(s.server)
 
-	log.Printf("Server running at port: %v", s.port)
+	router.SetTrustedProxies(nil)
+
+	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+
+		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
+			param.ClientIP,
+			param.TimeStamp.Format(time.RFC1123),
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.Request.UserAgent(),
+			param.ErrorMessage,
+		)
+	}))
+	router.Use(gin.Recovery())
+
 	log.Fatal(router.Run(":" + s.port))
 }

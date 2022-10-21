@@ -28,8 +28,8 @@ type User struct {
 	LastName  string `db:"last_name"`
 	Email     string
 	Login     string
-	Password  string
-	Active    bool
+	Password  string `db:"password" json:"-"`
+	Active    bool   `db:"active" json:"active"`
 }
 
 type Seller struct {
@@ -52,7 +52,7 @@ type Company struct {
 	AdressID    int32
 }
 
-type Adress struct {
+type Address struct {
 	ID         int32 `db:"id"`
 	Street     string
 	Number     string
@@ -62,6 +62,7 @@ type Adress struct {
 	District   string
 	Reference  string
 	AdressName string
+	UserID     int32 `db:"user_id"`
 }
 
 type Product struct {
@@ -73,8 +74,6 @@ type Product struct {
 	Ipi         decimal.Decimal
 	Active      bool
 	Company_ID  int32
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }
 
 type Order struct {
@@ -85,7 +84,7 @@ type Order struct {
 	PortageID  int32        `db:"portage_id"`
 	CustomerID int32        `db:"customer_id"`
 	EmployerID int32        `db:"employer_id"`
-	Obervation string
+	Obervation string       `db:"observation"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
