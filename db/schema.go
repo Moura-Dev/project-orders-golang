@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS sellers (
     	id SERIAL PRIMARY KEY,
     	user_id INT NOT NULL,
     	name VARCHAR(255) NOT NULL,
-    	tax_id VARCHAR(255) NOT NULL,
+    	tax_id VARCHAR(255) NOT NULL unique,
     	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
@@ -65,6 +65,19 @@ CREATE TABLE IF NOT EXISTS orders (
 	FOREIGN KEY (portage_id) REFERENCES users (id) ON DELETE CASCADE,
 	FOREIGN KEY (customer_id) REFERENCES users (id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS products (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(255) NOT NULL,
+	description VARCHAR(255),
+	cod VARCHAR(255),
+	price DECIMAL(10,2) NOT NULL,
+	ipi DECIMAL(10,2),
+	active BOOLEAN default True NOT NULL,
+	company_id INT NOT NULL,
+    user_id INT NOT NULL,
+	FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS order_items (
 	order_id INT NOT NULL,
@@ -74,16 +87,4 @@ CREATE TABLE IF NOT EXISTS order_items (
 	discount DECIMAL(10,2) NOT NULL,
 	FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
 	FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS products (
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(255) NOT NULL,
-	description VARCHAR(255) NOT NULL,
-	cod VARCHAR(255) NOT NULL,
-	price DECIMAL(10,2) NOT NULL,
-	ipi DECIMAL(10,2) NOT NULL,
-	active BOOLEAN default True NOT NULL,
-	company_id INT NOT NULL,
-	FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 );`
