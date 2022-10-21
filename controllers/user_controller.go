@@ -5,6 +5,7 @@ import (
 	"base-project-api/repository"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func CreateUser(ctx *gin.Context) {
@@ -26,13 +27,14 @@ func CreateUser(ctx *gin.Context) {
 
 func GetUserInfo(ctx *gin.Context) {
 	var user models.User
-
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	userId := ctx.Param("id")
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := repository.GetUserInfo(user)
+	user, err = repository.GetUserInfo(userIdInt, user)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -58,10 +60,15 @@ func CreateSeller(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, seller)
 }
 
-func GetSeller(ctx *gin.Context) {
+func GetSellerById(ctx *gin.Context) {
 	var seller models.Seller
-
-	seller, err := repository.GetSeller(seller)
+	sellerID := ctx.Param("id")
+	sellerIdInt, err := strconv.Atoi(sellerID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	seller, err = repository.GetSellerById(sellerIdInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -70,19 +77,30 @@ func GetSeller(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, seller)
 }
 
-func DeleteSeller(ctx *gin.Context) {
-	var seller models.Seller
-
-	if err := ctx.ShouldBindJSON(&seller); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	seller, err := repository.DeleteSeller(seller)
+func GetAllSellers(ctx *gin.Context) {
+	sellers, err := repository.GetAllSellers()
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, seller)
+	ctx.JSON(http.StatusOK, sellers)
+}
+
+func DeleteSeller(ctx *gin.Context) {
+
+	sellerID := ctx.Param("id")
+	sellerIdInt, err := strconv.Atoi(sellerID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = repository.DeleteSellerByID(sellerIdInt)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Deleted Successfully")
 }

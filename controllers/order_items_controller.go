@@ -51,3 +51,20 @@ func GetOrderItems(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, orderItems)
 }
+
+func UpdateOrderItems(ctx *gin.Context) {
+	var orderItems models.OrderItem
+
+	if err := ctx.ShouldBindJSON(&orderItems); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	orderItems, err := repository.UpdateOrderItems(orderItems)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, orderItems)
+}

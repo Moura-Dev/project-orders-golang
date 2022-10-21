@@ -5,6 +5,7 @@ import (
 	"base-project-api/repository"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func CreateCompany(ctx *gin.Context) {
@@ -42,20 +43,20 @@ func UpdateCompany(ctx *gin.Context) {
 }
 
 func DeleteCompany(ctx *gin.Context) {
-	var company models.Company
-
-	if err := ctx.ShouldBindJSON(&company); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	company, err := repository.DeleteCompany(company)
+	companyID := ctx.Param("id")
+	companyIDInt, err := strconv.Atoi(companyID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, company)
+	err = repository.DeleteCompany(companyIDInt)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Company deleted successfully")
 }
 
 func GetCompany(ctx *gin.Context) {

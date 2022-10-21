@@ -14,9 +14,9 @@ func CreateUser(user models.User) (models.User, error) {
 
 	return user, nil
 }
-func GetUserInfo(user models.User) (models.User, error) {
+func GetUserInfo(userID int, user models.User) (models.User, error) {
 
-	err := db.Conn.Get(&user, "SELECT * FROM users WHERE id = $1", user.ID)
+	err := db.Conn.Get(&user, "SELECT * FROM users WHERE id = $1", userID)
 	if err != nil {
 		return user, err
 	}
@@ -34,9 +34,9 @@ func CreateSeller(seller models.Seller) (models.Seller, error) {
 	return seller, nil
 }
 
-func GetSeller(seller models.Seller) (models.Seller, error) {
-
-	err := db.Conn.Get(&seller, "SELECT * FROM sellers WHERE user_id = $1", seller.UserID)
+func GetSellerById(sellerID int) (models.Seller, error) {
+	seller := models.Seller{}
+	err := db.Conn.Get(&seller, "SELECT id,user_id,name,tax_id FROM sellers WHERE id = $1", sellerID)
 	if err != nil {
 		return seller, err
 	}
@@ -44,12 +44,24 @@ func GetSeller(seller models.Seller) (models.Seller, error) {
 	return seller, nil
 }
 
-func DeleteSeller(seller models.Seller) (models.Seller, error) {
+func GetAllSellers() ([]models.Seller, error) {
 
-	_, err := db.Conn.NamedExec("DELETE FROM sellers WHERE user_id = :user_id", seller.UserID)
+	var sellers []models.Seller
+
+	err := db.Conn.Select(&sellers, "SELECT id, user_id, name, tax_id FROM sellers")
 	if err != nil {
-		return seller, err
+		return sellers, err
 	}
 
-	return seller, nil
+	return sellers, nil
+}
+
+// delete seller by id
+func DeleteSellerByID(sellerID int) error {
+	_, err := db.Conn.Exec("DELETE FROM sellers WHERE id = $1", sellerID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

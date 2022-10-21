@@ -6,33 +6,43 @@ import (
 )
 
 func CreateProduct(product models.Product) (models.Product, error) {
-	_, err := db.Conn.NamedExec("INSERT INTO products (name, description, price, company_id) VALUES (:name, :description, :price, :company_id)", product)
+	_, err := db.Conn.NamedExec("INSERT INTO products (name, description, cod, price, ipi, company_id, user_id) VALUES (:name, :description, :cod, :price, :ipi, :company_id, :user_id)", product)
 	if err != nil {
 		return product, err
 	}
 	return product, nil
 }
 
-func GetProduct(product models.Product) (models.Product, error) {
-	err := db.Conn.Get(&product, "SELECT * FROM products WHERE id = $1", product.ID)
+func GetProductByID(productID int) (models.Product, error) {
+	var product models.Product
+	err := db.Conn.Get(&product, "SELECT * FROM products WHERE id = $1", productID)
 	if err != nil {
 		return product, err
 	}
 	return product, nil
+}
+func GetAllProduts() ([]models.Product, error) {
+	var products []models.Product
+	err := db.Conn.Select(&products, "SELECT * FROM products")
+	if err != nil {
+		return products, err
+	}
+	return products, nil
 }
 
 func UpdateProduct(product models.Product) (models.Product, error) {
-	_, err := db.Conn.NamedExec("UPDATE products SET name = :name, description = :description, price = :price, company_id = :company_id WHERE id = :id", product)
+
+	_, err := db.Conn.NamedExec("UPDATE products SET name = :name, description = :description, cod= :cod , price= :price, ipi= :ipi, company_id = :company_id WHERE id = :id", product)
 	if err != nil {
 		return product, err
 	}
 	return product, nil
 }
 
-func DeleteProduct(product models.Product) (models.Product, error) {
-	_, err := db.Conn.NamedExec("DELETE FROM products WHERE id = :id", product)
+func DeleteProduct(productID int) error {
+	_, err := db.Conn.Exec("DELETE FROM products WHERE id = $1", productID)
 	if err != nil {
-		return product, err
+		return err
 	}
-	return product, nil
+	return nil
 }

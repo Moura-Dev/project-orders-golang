@@ -30,3 +30,11 @@ func GetOrderItems(orderItems models.OrderItem) (models.OrderItem, error) {
 	return orderItems, nil
 
 }
+
+func UpdateOrderItems(orderItems models.OrderItem) (models.OrderItem, error) {
+	_, err := db.Conn.NamedExec("UPDATE order_items SET order_id = :order_id, product_id = :product_id, quantity = :quantity, total_price = :total_price WHERE id = :id", orderItems)
+	if err != nil {
+		return orderItems, err
+	}
+	return orderItems, nil
+}
