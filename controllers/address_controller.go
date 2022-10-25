@@ -5,6 +5,7 @@ import (
 	"base-project-api/repository"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func CreateAddress(ctx *gin.Context) {
@@ -43,13 +44,11 @@ func UpdateAddress(ctx *gin.Context) {
 
 func GetAddresses(ctx *gin.Context) {
 	var address models.Address
+	//user id
+	userID := ctx.Param("id")
+	userIDIdInt, err := strconv.Atoi(userID)
 
-	if err := ctx.ShouldBindJSON(&address); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	address, err := repository.GetAddress(address)
+	address, err = repository.GetAddress(userIDIdInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -59,18 +58,17 @@ func GetAddresses(ctx *gin.Context) {
 }
 
 func DeleteAddress(ctx *gin.Context) {
-	var address models.Address
-
-	if err := ctx.ShouldBindJSON(&address); err != nil {
+	addressID := ctx.Param("id")
+	addressIDInt, err := strconv.Atoi(addressID)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	address, err := repository.DeleteAddress(address)
+	err = repository.DeleteAddress(addressIDInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, address)
+	ctx.JSON(http.StatusOK, gin.H{"message": "Address deleted successfully"})
 }

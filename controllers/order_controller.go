@@ -5,6 +5,7 @@ import (
 	"base-project-api/repository"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func CreateOrder(ctx *gin.Context) {
@@ -25,20 +26,20 @@ func CreateOrder(ctx *gin.Context) {
 }
 
 func DeleteOrder(ctx *gin.Context) {
-	var order models.Order
-
-	if err := ctx.ShouldBindJSON(&order); err != nil {
+	userId := 1
+	orderID := ctx.Param("id")
+	orderIDInt, err := strconv.Atoi(orderID)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	order, err := repository.DeleteOrder(order)
+	err = repository.DeleteOrder(orderIDInt, userId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, order)
+	ctx.JSON(http.StatusOK, "Order deleted successfully")
 }
 
 func UpdateOrder(ctx *gin.Context) {
@@ -59,8 +60,8 @@ func UpdateOrder(ctx *gin.Context) {
 }
 
 func GetOrders(ctx *gin.Context) {
-	var order models.Order
-	orders, err := repository.GetOrders(order)
+	userID := 1
+	orders, err := repository.GetAllOrders(userID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

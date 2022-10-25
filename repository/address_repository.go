@@ -5,34 +5,35 @@ import (
 	"base-project-api/models"
 )
 
-func CreateAddress(adress models.Address) (models.Address, error) {
-	_, err := db.Conn.NamedExec("INSERT INTO adresses (street, number, complement, neighborhood, city, state, zip_code, user_id) VALUES (:street, :number, :complement, :neighborhood, :city, :state, :zip_code, :user_id)", adress)
+func CreateAddress(address models.Address) (models.Address, error) {
+	_, err := db.Conn.NamedExec("INSERT INTO addresses (street, number, zip_code, city, state, district, reference, addressname, user_id) VALUES (:street, :number, :zip_code, :city, :state, :district, :reference, :addressname, :user_id)", address)
 	if err != nil {
-		return adress, err
+		return address, err
 	}
-	return adress, nil
+	return address, nil
 }
 
-func DeleteAddress(adress models.Address) (models.Address, error) {
-	_, err := db.Conn.NamedExec("DELETE FROM adresses WHERE user_id = :user_id", adress)
+func DeleteAddress(addressID int) error {
+	_, err := db.Conn.Exec("DELETE FROM addresses WHERE id = $1", addressID)
 	if err != nil {
-		return adress, err
+		return err
 	}
-	return adress, nil
+	return nil
 }
 
-func GetAddress(adress models.Address) (models.Address, error) {
-	err := db.Conn.Get(&adress, "SELECT * FROM adresses WHERE user_id = $1", adress.UserID)
+func GetAddress(userID int) (models.Address, error) {
+	var address models.Address
+	err := db.Conn.Get(&address, "SELECT * FROM addresses WHERE user_id = $1", userID)
 	if err != nil {
-		return adress, err
+		return address, err
 	}
-	return adress, nil
+	return address, nil
 }
 
-func UpdateAddress(adress models.Address) (models.Address, error) {
-	_, err := db.Conn.NamedExec("UPDATE adresses SET street = :street, number = :number, complement = :complement, neighborhood = :neighborhood, city = :city, state = :state, zip_code = :zip_code WHERE user_id = :user_id", adress)
+func UpdateAddress(address models.Address) (models.Address, error) {
+	_, err := db.Conn.NamedExec("UPDATE addresses SET street = :street, number = :number, city = :city, state = :state, district = :district, reference = :reference, addressname=:addressname WHERE id = :id", address)
 	if err != nil {
-		return adress, err
+		return address, err
 	}
-	return adress, nil
+	return address, nil
 }

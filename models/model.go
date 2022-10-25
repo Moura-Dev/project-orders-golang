@@ -54,16 +54,16 @@ type Company struct {
 }
 
 type Address struct {
-	ID         int32 `db:"id"`
-	Street     string
-	Number     string
-	ZipCode    string `db:"zip_code"`
-	City       string
-	State      string
-	District   string
-	Reference  string
-	AdressName string
-	UserID     int32 `db:"user_id" json:"user_id"`
+	ID          int32  `db:"id"`
+	Street      string `db:"street" json:"street"`
+	Number      string `db:"number" json:"number"`
+	ZipCode     string `db:"zip_code" json:"zip_code"`
+	City        string `db:"city" json:"city"`
+	State       string `db:"state" json:"state"`
+	District    string `db:"district" json:"district"`
+	Reference   string `db:"reference" json:"reference"`
+	AddressName string `db:"addressname" json:"address_name"`
+	UserID      int32  `db:"user_id" json:"user_id"`
 }
 
 type Product struct {
@@ -79,22 +79,22 @@ type Product struct {
 }
 
 type Order struct {
-	ID         int32        `db:"id"`
-	Status     StatusType   `db:"status_type"`
-	Shipping   ShippingType `db:"shipping"`
-	UserID     int32        `db:"user_id"`
-	PortageID  int32        `db:"portage_id"`
-	CustomerID int32        `db:"customer_id"`
-	EmployerID int32        `db:"employer_id"`
-	Obervation string       `db:"observation"`
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	ID         int32     `db:"id" json:"id"`
+	Status     string    `db:"status" json:"status"`
+	Shipping   string    `db:"shipping" json:"shipping"`
+	UserID     int32     `db:"user_id" json:"user_id"`
+	PortageID  int32     `db:"portage_id" json:"portage_id"`
+	CustomerID int32     `db:"customer_id" json:"customer_id"`
+	Purchaser  string    `db:"purchaser" json:"purchaser"`
+	Obervation string    `db:"observation" json:"observation"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt  time.Time `db:"updated_at" json:"updated_at"`
 }
 
 type OrderItem struct {
-	OrderID      int32 `db:"order_id"`
-	ProductID    int32 `db:"product_id"`
-	Quantity     int32
-	PriceDecimal decimal.Decimal
-	Discount     decimal.Decimal
+	OrderID      int32           `db:"order_id" json:"order_id"`
+	ProductID    int32           `db:"product_id" json:"product_id"`
+	Quantity     int32           `db:"quantity" json:"quantity"`
+	PriceDecimal decimal.Decimal `db:"price" json:"price"`
+	Discount     decimal.Decimal `db:"discount" json:"discount"`
 }

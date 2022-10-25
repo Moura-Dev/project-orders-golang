@@ -53,11 +53,11 @@ CREATE TABLE IF NOT EXISTS addresses (
 CREATE TABLE IF NOT EXISTS orders (
 	id SERIAL PRIMARY KEY,
 	status VARCHAR(255) NOT NULL,
-	shipping DECIMAL(10,2) NOT NULL,
+	shipping VARCHAR(10) NOT NULL,
 	user_id INT NOT NULL,
-	portage_id INT NOT NULL,
+	portage_id INT,
 	customer_id INT NOT NULL,
-	employee VARCHAR(255),
+	purchaser VARCHAR(255),
 	observation VARCHAR(255),
 	created_at TIMESTAMP default NOW(),
 	updated_at TIMESTAMP default NOW(),
@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
+    id SERIAL PRIMARY KEY,
 	order_id INT NOT NULL,
 	product_id INT NOT NULL,
 	quantity INT NOT NULL,

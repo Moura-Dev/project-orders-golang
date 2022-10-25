@@ -5,8 +5,8 @@ import (
 	"base-project-api/models"
 )
 
-func CreateOrderItems(orderItems models.OrderItem) (models.OrderItem, error) {
-	_, err := db.Conn.NamedExec("INSERT INTO order_items (order_id, product_id, quantity, total_price) VALUES (:order_id, :product_id, :quantity, :total_price)", orderItems)
+func InsertItemsOrder(orderItems models.OrderItem) (models.OrderItem, error) {
+	_, err := db.Conn.NamedExec("INSERT INTO order_items (order_id, product_id, quantity, price, discount) VALUES (:order_id, :product_id, :quantity, :price, :discount)", orderItems)
 	if err != nil {
 		return orderItems, err
 
@@ -14,25 +14,25 @@ func CreateOrderItems(orderItems models.OrderItem) (models.OrderItem, error) {
 	return orderItems, nil
 }
 
-func DeleteOrderItems(orderItems models.OrderItem) (models.OrderItem, error) {
-	_, err := db.Conn.NamedExec("DELETE FROM order_items WHERE id = :id", orderItems)
+func DeleteOrderItems(productID int, orderID int) error {
+	_, err := db.Conn.Exec("DELETE FROM order_items WHERE product_id = $1 AND order_id = $2", productID, orderID)
 	if err != nil {
-		return orderItems, err
+		return err
 	}
-	return orderItems, nil
+	return nil
 }
 
-func GetOrderItems(orderItems models.OrderItem) (models.OrderItem, error) {
-	err := db.Conn.Get(&orderItems, "SELECT * FROM order_items WHERE order_id = $1", orderItems.OrderID)
+func GetAllItemsInOrder(orderID int) ([]models.OrderItem, error) {
+	var items []models.OrderItem
+	err := db.Conn.Select(&items, "SELECT * FROM order_items WHERE order_id = $1", orderID)
 	if err != nil {
-		return orderItems, err
+		return items, err
 	}
-	return orderItems, nil
-
+	return items, nil
 }
 
 func UpdateOrderItems(orderItems models.OrderItem) (models.OrderItem, error) {
-	_, err := db.Conn.NamedExec("UPDATE order_items SET order_id = :order_id, product_id = :product_id, quantity = :quantity, total_price = :total_price WHERE id = :id", orderItems)
+	_, err := db.Conn.NamedExec("UPDATE order_items SET product_id = :product_id, quantity = :quantity, price = :price, discount = :discount WHERE product_id = :product_id", orderItems)
 	if err != nil {
 		return orderItems, err
 	}

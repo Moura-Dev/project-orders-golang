@@ -5,9 +5,10 @@ import (
 	"base-project-api/repository"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
-func CreateOrderItems(ctx *gin.Context) {
+func InsertItemsOrder(ctx *gin.Context) {
 	var orderItems models.OrderItem
 
 	if err := ctx.ShouldBindJSON(&orderItems); err != nil {
@@ -15,7 +16,7 @@ func CreateOrderItems(ctx *gin.Context) {
 		return
 	}
 
-	orderItems, err := repository.CreateOrderItems(orderItems)
+	orderItems, err := repository.InsertItemsOrder(orderItems)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -25,25 +26,26 @@ func CreateOrderItems(ctx *gin.Context) {
 }
 
 func DeleteOrderItems(ctx *gin.Context) {
-	var orderItems models.OrderItem
-
-	if err := ctx.ShouldBindJSON(&orderItems); err != nil {
+	orderItemID := ctx.Param("id")
+	orderItemIDInt, err := strconv.Atoi(orderItemID)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	order_id := 3
 
-	orderItems, err := repository.DeleteOrderItems(orderItems)
+	err = repository.DeleteOrderItems(orderItemIDInt, order_id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, orderItems)
+	ctx.JSON(http.StatusOK, "Item deleted successfully")
 }
 
-func GetOrderItems(ctx *gin.Context) {
-	var items models.OrderItem
-	orderItems, err := repository.GetOrderItems(items)
+func GetAllItemsInOrder(ctx *gin.Context) {
+	order_id := 4
+	orderItems, err := repository.GetAllItemsInOrder(order_id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
