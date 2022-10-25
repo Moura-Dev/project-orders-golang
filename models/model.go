@@ -26,8 +26,8 @@ type User struct {
 	ID        int32  `db:"id"`
 	FirstName string `db:"first_name" json:"first_name"`
 	LastName  string `db:"last_name" json:"last_name"`
-	Email     string
-	Login     string
+	Email     string `db:"email" json:"email"`
+	Login     string `db:"login" json:"login"`
 	Password  string `db:"password" json:"password"`
 	Active    bool   `db:"active" json:"active"`
 }

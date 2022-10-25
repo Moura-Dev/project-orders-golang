@@ -2,22 +2,24 @@ package routes
 
 import (
 	"base-project-api/controllers"
+	middlewares "base-project-api/server/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func ConfigRoutes(router *gin.Engine) *gin.Engine {
 	main := router.Group("api/")
+	main.POST("/login", controllers.Login)
+	main.POST("/user", controllers.CreateUser)
 	{
-		routers := main.Group("/")
+		routers := main.Group("/", middlewares.AuthJwt())
 		{
 			routers.GET("/", controllers.HellowControllers)
-			routers.POST("/user", controllers.CreateUser)
 			routers.POST("/seller", controllers.CreateSeller)
 			routers.GET("/seller/:id", controllers.GetSellerById)
 			routers.GET("/seller", controllers.GetAllSellers)
 			routers.DELETE("/seller/:id", controllers.DeleteSeller)
-			routers.GET("/user/:id", controllers.GetUserInfo)
+			routers.GET("/user", controllers.GetUserInfo)
 			routers.GET("/company", controllers.GetCompany)
 			routers.POST("/company", controllers.CreateCompany)
 			routers.DELETE("/company/:id", controllers.DeleteCompany)

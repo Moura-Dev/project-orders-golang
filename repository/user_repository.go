@@ -14,9 +14,19 @@ func CreateUser(user models.User) (models.User, error) {
 
 	return user, nil
 }
-func GetUserInfo(userID int, user models.User) (models.User, error) {
-
+func GetUserInfo(userID int) (models.User, error) {
+	user := models.User{}
 	err := db.Conn.Get(&user, "SELECT * FROM users WHERE id = $1", userID)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func GetUser(login string) (models.User, error) {
+	user := models.User{}
+	err := db.Conn.Get(&user, "SELECT * FROM users WHERE login = $1", login)
 	if err != nil {
 		return user, err
 	}
