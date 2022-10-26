@@ -24,7 +24,8 @@ func DeleteOrderItems(productID int, orderID int) error {
 
 func GetAllItemsInOrder(orderID int) ([]models.OrderItem, error) {
 	var items []models.OrderItem
-	err := db.Conn.Select(&items, "SELECT * FROM order_items WHERE order_id = $1", orderID)
+	err := db.Conn.Select(&items, "SELECT order_id,product_id,quantity,price, discount, (100-discount) * (price*quantity/100) AS total FROM order_items WHERE order_id = $1", orderID)
+
 	if err != nil {
 		return items, err
 	}

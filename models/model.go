@@ -79,22 +79,24 @@ type Product struct {
 }
 
 type Order struct {
-	ID         int32     `db:"id" json:"id"`
-	Status     string    `db:"status" json:"status"`
-	Shipping   string    `db:"shipping" json:"shipping"`
-	UserID     int32     `db:"user_id" json:"user_id"`
-	PortageID  int32     `db:"portage_id" json:"portage_id"`
-	CustomerID int32     `db:"customer_id" json:"customer_id"`
-	Purchaser  string    `db:"purchaser" json:"purchaser"`
-	Obervation string    `db:"observation" json:"observation"`
-	CreatedAt  time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt  time.Time `db:"updated_at" json:"updated_at"`
+	ID         int32           `db:"id" json:"id"`
+	Status     string          `db:"status" json:"status"`
+	Shipping   string          `db:"shipping" json:"shipping"`
+	UserID     int32           `db:"user_id" json:"user_id"`
+	PortageID  int32           `db:"portage_id" json:"portage_id"`
+	CustomerID int32           `db:"customer_id" json:"customer_id"`
+	Purchaser  string          `db:"purchaser" json:"purchaser"`
+	Obervation string          `db:"observation" json:"observation"`
+	Total      decimal.Decimal `json:"total"`
+	CreatedAt  time.Time       `db:"created_at" json:"created_at"`
+	UpdatedAt  time.Time       `db:"updated_at" json:"updated_at"`
 }
 
 type OrderItem struct {
-	OrderID      int32           `db:"order_id" json:"order_id"`
-	ProductID    int32           `db:"product_id" json:"product_id"`
-	Quantity     int32           `db:"quantity" json:"quantity"`
-	PriceDecimal decimal.Decimal `db:"price" json:"price"`
-	Discount     decimal.Decimal `db:"discount" json:"discount"`
+	OrderID   int32           `db:"order_id" json:"order_id"`
+	ProductID int32           `db:"product_id" json:"product_id"`
+	Quantity  int32           `db:"quantity" json:"quantity"`
+	Price     decimal.Decimal `db:"price" json:"price"`
+	Discount  float32         `db:"discount" json:"discount"`
+	Total     decimal.Decimal `db:"total" json:"total"`
 }

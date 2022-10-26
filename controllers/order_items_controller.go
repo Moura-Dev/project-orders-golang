@@ -15,7 +15,6 @@ func InsertItemsOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	orderItems, err := repository.InsertItemsOrder(orderItems)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -44,8 +43,13 @@ func DeleteOrderItems(ctx *gin.Context) {
 }
 
 func GetAllItemsInOrder(ctx *gin.Context) {
-	order_id := 4
-	orderItems, err := repository.GetAllItemsInOrder(order_id)
+	orderID := ctx.Param("id")
+	orderIDInt, err := strconv.Atoi(orderID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	orderItems, err := repository.GetAllItemsInOrder(orderIDInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
