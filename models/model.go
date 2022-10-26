@@ -33,7 +33,7 @@ type User struct {
 }
 
 type Seller struct {
-	ID     int32  `db:"id" json:"id"`
+	ID     int32  `db:"id" json:"-"`
 	UserID int32  `db:"user_id" json:"user_id"`
 	Name   string `db:"name"`
 	TaxID  string `db:"tax_id" json:"tax_id"`

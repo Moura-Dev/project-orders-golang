@@ -13,21 +13,21 @@ func CreateAddress(address models.Address) (models.Address, error) {
 	return address, nil
 }
 
-func DeleteAddress(addressID int) error {
-	_, err := db.Conn.Exec("DELETE FROM addresses WHERE id = $1", addressID)
+func DeleteAddress(userID int, addressID int) error {
+	_, err := db.Conn.Exec("DELETE FROM addresses WHERE id = $1 AND user_id = $2", addressID, userID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetAddress(userID int) (models.Address, error) {
-	var address models.Address
-	err := db.Conn.Get(&address, "SELECT * FROM addresses WHERE user_id = $1", userID)
+func GetAllAddress(userID int) ([]models.Address, error) {
+	var addresses []models.Address
+	err := db.Conn.Select(&addresses, "SELECT * FROM addresses WHERE user_id = $1", userID)
 	if err != nil {
-		return address, err
+		return addresses, err
 	}
-	return address, nil
+	return addresses, nil
 }
 
 func UpdateAddress(address models.Address) (models.Address, error) {

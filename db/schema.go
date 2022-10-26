@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS orders (
 	created_at TIMESTAMP default NOW(),
 	updated_at TIMESTAMP default NOW(),
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-	FOREIGN KEY (portage_id) REFERENCES users (id) ON DELETE CASCADE,
-	FOREIGN KEY (customer_id) REFERENCES users (id) ON DELETE CASCADE
+	FOREIGN KEY (portage_id) REFERENCES companies (id) ON DELETE CASCADE,
+	FOREIGN KEY (customer_id) REFERENCES companies (id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS products (
 	id SERIAL PRIMARY KEY,

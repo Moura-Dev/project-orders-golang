@@ -54,11 +54,11 @@ func GetSellerById(sellerID int) (models.Seller, error) {
 	return seller, nil
 }
 
-func GetAllSellers() ([]models.Seller, error) {
+func GetAllSellers(userID int) ([]models.Seller, error) {
 
 	var sellers []models.Seller
 
-	err := db.Conn.Select(&sellers, "SELECT id, user_id, name, tax_id FROM sellers")
+	err := db.Conn.Select(&sellers, "SELECT id, user_id, name, tax_id FROM sellers WHERE user_id = $1", userID)
 	if err != nil {
 		return sellers, err
 	}

@@ -33,6 +33,12 @@ func GetUserInfo(ctx *gin.Context) {
 	token := ctx.Request.Header.Get("authorization")
 	token = token[7:]
 	userId, err := services.NewJWTService().GetUserIdFromToken(token)
+	if err != nil {
+		ctx.JSON(401, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -56,8 +62,23 @@ func CreateSeller(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	token := ctx.Request.Header.Get("authorization")
+	token = token[7:]
+	userId, err := services.NewJWTService().GetUserIdFromToken(token)
+	if err != nil {
+		ctx.JSON(401, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	seller.UserID = int32(userIdInt)
 
-	seller, err := repository.CreateSeller(seller)
+	seller, err = repository.CreateSeller(seller)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -68,6 +89,7 @@ func CreateSeller(ctx *gin.Context) {
 
 func GetSellerById(ctx *gin.Context) {
 	var seller models.Seller
+
 	sellerID := ctx.Param("id")
 	sellerIdInt, err := strconv.Atoi(sellerID)
 	if err != nil {
@@ -84,7 +106,21 @@ func GetSellerById(ctx *gin.Context) {
 }
 
 func GetAllSellers(ctx *gin.Context) {
-	sellers, err := repository.GetAllSellers()
+	token := ctx.Request.Header.Get("authorization")
+	token = token[7:]
+	userId, err := services.NewJWTService().GetUserIdFromToken(token)
+	if err != nil {
+		ctx.JSON(401, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	sellers, err := repository.GetAllSellers(userIdInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -140,6 +176,6 @@ func Login(ctx *gin.Context) { // Get User in db
 	}
 
 	ctx.JSON(200, gin.H{
-		"token": token,
+		"access_token": token,
 	})
 }

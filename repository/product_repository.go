@@ -13,17 +13,17 @@ func CreateProduct(product models.Product) (models.Product, error) {
 	return product, nil
 }
 
-func GetProductByID(productID int) (models.Product, error) {
+func GetProductByID(userID int, productID int) (models.Product, error) {
 	var product models.Product
-	err := db.Conn.Get(&product, "SELECT * FROM products WHERE id = $1", productID)
+	err := db.Conn.Get(&product, "SELECT * FROM products WHERE id = $1 AND user_id = $2", productID, userID)
 	if err != nil {
 		return product, err
 	}
 	return product, nil
 }
-func GetAllProduts() ([]models.Product, error) {
+func GetAllProducts(userID int) ([]models.Product, error) {
 	var products []models.Product
-	err := db.Conn.Select(&products, "SELECT * FROM products")
+	err := db.Conn.Select(&products, "SELECT * FROM products WHERE user_id = $1", userID)
 	if err != nil {
 		return products, err
 	}
@@ -39,8 +39,8 @@ func UpdateProduct(product models.Product) (models.Product, error) {
 	return product, nil
 }
 
-func DeleteProduct(productID int) error {
-	_, err := db.Conn.Exec("DELETE FROM products WHERE id = $1", productID)
+func DeleteProduct(userID int, productID int) error {
+	_, err := db.Conn.Exec("DELETE FROM products WHERE id = $1 AND user_id = $2", productID, userID)
 	if err != nil {
 		return err
 	}
