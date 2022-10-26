@@ -37,10 +37,10 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 			routers.POST("/order", controllers.CreateOrder)
 			routers.PUT("/order", controllers.UpdateOrder)
 			routers.DELETE("/order/:id", controllers.DeleteOrder)
-			routers.POST("/orderitems", controllers.InsertItemsOrder)
-			routers.PUT("/orderitems", controllers.UpdateOrderItems)
-			routers.DELETE("/orderitems/:id", controllers.DeleteOrderItems)
-			routers.GET("/orderitems/:id", controllers.GetAllItemsInOrder)
+			routers.POST("/order/:id/item", controllers.InsertItemsOrder)
+			routers.PUT("/order/:id/item", controllers.UpdateOrderItems)
+			routers.DELETE("/order/:id/item/:productID", controllers.DeleteOrderItems)
+			routers.GET("/order/:id/item", controllers.GetAllItemsInOrder)
 
 		}
 	}

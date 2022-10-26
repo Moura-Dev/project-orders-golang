@@ -15,7 +15,14 @@ func InsertItemsOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	orderItems, err := repository.InsertItemsOrder(orderItems)
+	orderItemID := ctx.Param("id")
+	orderItemIDInt, err := strconv.Atoi(orderItemID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	orderItems.OrderID = int32(orderItemIDInt)
+	orderItems, err = repository.InsertItemsOrder(orderItems)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -31,9 +38,14 @@ func DeleteOrderItems(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	order_id := 3
+	productID := ctx.Param("productID")
+	productIDInt, err := strconv.Atoi(productID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-	err = repository.DeleteOrderItems(orderItemIDInt, order_id)
+	err = repository.DeleteOrderItems(productIDInt, orderItemIDInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -66,7 +78,15 @@ func UpdateOrderItems(ctx *gin.Context) {
 		return
 	}
 
-	orderItems, err := repository.UpdateOrderItems(orderItems)
+	orderID := ctx.Param("id")
+	orderIDInt, err := strconv.Atoi(orderID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	orderItems.OrderID = int32(orderIDInt)
+
+	orderItems, err = repository.UpdateOrderItems(orderItems)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

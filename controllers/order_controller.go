@@ -123,6 +123,15 @@ func GetAllOrdersByID(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	//include total in order
+	for i := 0; i < len(orders); i++ {
+		total, err := services.SumValues(int(orders[i].ID))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		orders[i].Total = total
+	}
 
 	ctx.JSON(http.StatusOK, orders)
 }
