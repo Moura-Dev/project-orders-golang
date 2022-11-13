@@ -3,6 +3,7 @@ package server
 import (
 	"base-project-api/server/routes"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"os"
@@ -41,6 +42,7 @@ func (s *Server) Run() {
 		)
 	}))
 	router.Use(gin.Recovery())
+	router.Use(cors.Default())
 
 	log.Fatal(router.Run(":" + s.port))
 }

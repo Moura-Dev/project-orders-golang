@@ -8,11 +8,11 @@ import (
 )
 
 func ConfigRoutes(router *gin.Engine) *gin.Engine {
-	main := router.Group("api/", middlewares.CORSMiddleware())
+	main := router.Group("api/")
 	main.POST("/login", controllers.Login)
 	main.POST("/user", controllers.CreateUser)
 	{
-		routers := main.Group("/", middlewares.AuthJwt(), middlewares.CORSMiddleware())
+		routers := main.Group("/", middlewares.AuthJwt())
 		{
 			routers.GET("/", controllers.HellowControllers)
 			routers.POST("/seller", controllers.CreateSeller)

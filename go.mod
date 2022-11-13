@@ -3,16 +3,15 @@ module base-project-api
 go 1.18
 
 require (
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.2
 	github.com/shopspring/decimal v1.3.1
 )
 
-require (
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-)
+require golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect

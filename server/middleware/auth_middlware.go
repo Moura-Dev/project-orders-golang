@@ -9,11 +9,6 @@ import (
 func AuthJwt() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Get the client secret key
-		ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		ctx.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		ctx.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		ctx.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-
 		authorization := ctx.GetHeader("Authorization")
 		if authorization == "" {
 			ctx.JSON(401, gin.H{
