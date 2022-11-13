@@ -3,6 +3,7 @@ package routes
 import (
 	"base-project-api/controllers"
 	middlewares "base-project-api/server/middleware"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,6 +12,8 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 	main := router.Group("api/", middlewares.CORSMiddleware())
 	main.POST("/login", controllers.Login)
 	main.POST("/user", controllers.CreateUser)
+	main.OPTIONS("/user", preflight)
+	main.OPTIONS("/", preflight)
 	{
 		routers := main.Group("/", middlewares.AuthJwt())
 		{
@@ -45,4 +48,10 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 		}
 	}
 	return router
+}
+
+func preflight(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers")
+	c.JSON(http.StatusOK, struct{}{})
 }
