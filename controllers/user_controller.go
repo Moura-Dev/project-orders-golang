@@ -148,6 +148,8 @@ func DeleteSeller(ctx *gin.Context) {
 }
 
 func Login(ctx *gin.Context) { // Get User in db
+	ctx.Header("Access-Control-Allow-Origin", "*")
+	ctx.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 	data := models.User{}
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
