@@ -8,7 +8,7 @@ import (
 )
 
 func ConfigRoutes(router *gin.Engine) *gin.Engine {
-	main := router.Group("api/")
+	main := router.Group("api/", middlewares.CORSMiddleware())
 	main.POST("/login", controllers.Login)
 	main.POST("/user", controllers.CreateUser)
 	{
