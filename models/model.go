@@ -75,7 +75,7 @@ type Product struct {
 	Ipi         decimal.Decimal `db:"ipi" json:"ipi"`
 	Active      bool
 	UserID      int32 `db:"user_id" json:"user_id"`
-	Company_ID  int32 `db:"company_id" json:"company_id"`
+	CompanyId   int32 `db:"company_id" json:"company_id"`
 }
 
 type Order struct {
