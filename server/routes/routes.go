@@ -3,11 +3,19 @@ package routes
 import (
 	"base-project-api/controllers"
 	middlewares "base-project-api/server/middleware"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func ConfigRoutes(router *gin.Engine) *gin.Engine {
-	main := router.Group("api/", middlewares.CORSMiddleware())
+	router = gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"}
+	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization", "Authentication"}
+
+	router.Use(cors.New(config))
+
+	main := router.Group("api/")
 	main.POST("/login", controllers.Login)
 	main.POST("/user", controllers.CreateUser)
 	{
