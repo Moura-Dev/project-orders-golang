@@ -41,11 +41,6 @@ func (s *Server) Run() {
 		)
 	}))
 	router.Use(gin.Recovery())
-	//router.Use(cors.New(cors.Config{
-	//	AllowOrigins:     []string{"*"},
-	//	AllowCredentials: true,
-	//	AllowMethods:     []string{"GET", "DELETE", "POST", "PUT"},
-	//}))
 
 	log.Fatal(router.Run(":" + s.port))
 }
