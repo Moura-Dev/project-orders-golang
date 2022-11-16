@@ -270,7 +270,7 @@
 			"name": "Product",
 			"item": [
 				{
-					"name": "Get",
+					"name": "GetArray",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -290,7 +290,7 @@
 					"response": []
 				},
 				{
-					"name": "GetById",
+					"name": "Get",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -320,7 +320,7 @@
 					"response": []
 				},
 				{
-					"name": "DeleteById",
+					"name": "Delete",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -546,7 +546,7 @@
 			"name": "Address",
 			"item": [
 				{
-					"name": "GetByUserId",
+					"name": "Get",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -575,7 +575,7 @@
 					"response": []
 				},
 				{
-					"name": "DeleteById",
+					"name": "Delete",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -665,7 +665,7 @@
 			]
 		},
 		{
-			"name": "Item in order",
+			"name": "OrderItems",
 			"item": [
 				{
 					"name": "Get",
