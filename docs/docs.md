@@ -53,3 +53,7 @@ Fonte de dados:
 
 1. O usuário não deve, não deveria, preencher nenhuma informação além daquilo que for extremamente necessário.
 2. Nós precisamos fazer o trabalho sujo, inserção de dado, etc.
+
+# Diagrams
+
+![alt text](business.png)
