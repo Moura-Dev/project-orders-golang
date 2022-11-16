@@ -12,7 +12,6 @@ func main() {
 		panic(err)
 	}
 	database, _ := db.StartDB()
-	database.MustExec(db.Schema)
 
 	defer database.Close()
 

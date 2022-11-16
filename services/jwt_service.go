@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"strconv"
 	"time"
 
@@ -68,4 +69,21 @@ func (s *jwtService) GetUserIdFromToken(t string) (string, error) {
 		return claims["jti"].(string), nil
 	}
 	return "", err
+}
+
+func GetUserIdFromContext(ctx *gin.Context) (int, error) {
+	token := ctx.Request.Header.Get("authorization")
+	token = token[7:]
+	userId, err := NewJWTService().GetUserIdFromToken(token)
+	if err != nil {
+		ctx.JSON(401, gin.H{
+			"error": err.Error(),
+		})
+		return 0, nil
+	}
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return 0, err
+	}
+	return userIdInt, err
 }

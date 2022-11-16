@@ -1,18 +1,18 @@
-package controllers
+package address_controller
 
 import (
 	"base-project-api/models"
-	"base-project-api/repository"
+	"base-project-api/repository/address_repository"
 	"base-project-api/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )
 
-func CreateProduct(ctx *gin.Context) {
-	var product models.Product
+func Create(ctx *gin.Context) {
+	var address models.Address
 
-	if err := ctx.ShouldBindJSON(&product); err != nil {
+	if err := ctx.ShouldBindJSON(&address); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -30,21 +30,20 @@ func CreateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	product.UserID = int32(userIdInt)
-
-	product, err = repository.CreateProduct(product)
+	address.UserId = int32(userIdInt)
+	address, err = address_repository.Create(address)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, product)
+	ctx.JSON(http.StatusOK, address)
 }
 
-func UpdateProduct(ctx *gin.Context) {
-	var product models.Product
+func Update(ctx *gin.Context) {
+	var address models.Address
 
-	if err := ctx.ShouldBindJSON(&product); err != nil {
+	if err := ctx.ShouldBindJSON(&address); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -62,19 +61,19 @@ func UpdateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	product.UserID = int32(userIdInt)
-	product, err = repository.UpdateProduct(product)
+	address.UserId = int32(userIdInt)
+
+	address, err = address_repository.Update(address)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, product)
+	ctx.JSON(http.StatusOK, address)
 }
 
-func DeleteProduct(ctx *gin.Context) {
-	productID := ctx.Param("id")
-	productIdInt, err := strconv.Atoi(productID)
+func Get(ctx *gin.Context) {
+	var address []models.Address
 	token := ctx.Request.Header.Get("authorization")
 	token = token[7:]
 	userId, err := services.NewJWTService().GetUserIdFromToken(token)
@@ -89,20 +88,23 @@ func DeleteProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err = repository.DeleteProduct(userIdInt, productIdInt)
+
+	address, err = address_repository.Get(userIdInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "Product deleted successfully")
+	ctx.JSON(http.StatusOK, address)
 }
 
-func GetProductByID(ctx *gin.Context) {
-	var product models.Product
-	productID := ctx.Param("id")
-	productIdInt, err := strconv.Atoi(productID)
-
+func Delete(ctx *gin.Context) {
+	addressID := ctx.Param("id")
+	addressIDInt, err := strconv.Atoi(addressID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	token := ctx.Request.Header.Get("authorization")
 	token = token[7:]
 	userId, err := services.NewJWTService().GetUserIdFromToken(token)
@@ -117,35 +119,11 @@ func GetProductByID(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	product, err = repository.GetProductByID(userIdInt, productIdInt)
+	err = address_repository.Delete(userIdInt, addressIDInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, product)
-}
-
-func GetAllProducts(ctx *gin.Context) {
-	token := ctx.Request.Header.Get("authorization")
-	token = token[7:]
-	userId, err := services.NewJWTService().GetUserIdFromToken(token)
-	if err != nil {
-		ctx.JSON(401, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	products, err := repository.GetAllProducts(userIdInt)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, products)
+	ctx.JSON(http.StatusOK, gin.H{"message": "Address deleted successfully"})
 }

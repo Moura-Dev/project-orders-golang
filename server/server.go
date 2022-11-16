@@ -24,8 +24,6 @@ func NewServer() Server {
 func (s *Server) Run() {
 	router := routes.ConfigRoutes(s.server)
 
-	router.SetTrustedProxies(nil)
-
 	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 
 		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
@@ -40,6 +38,7 @@ func (s *Server) Run() {
 			param.ErrorMessage,
 		)
 	}))
+
 	router.Use(gin.Recovery())
 
 	log.Fatal(router.Run(":" + s.port))

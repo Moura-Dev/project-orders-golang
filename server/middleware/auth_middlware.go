@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"base-project-api/services"
-
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,18 +1,18 @@
-package controllers
+package company_controller
 
 import (
 	"base-project-api/models"
-	"base-project-api/repository"
+	"base-project-api/repository/company_repository"
 	"base-project-api/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )
 
-func CreateAddress(ctx *gin.Context) {
-	var address models.Address
+func Create(ctx *gin.Context) {
+	var company models.Company
 
-	if err := ctx.ShouldBindJSON(&address); err != nil {
+	if err := ctx.ShouldBindJSON(&company); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -30,23 +30,24 @@ func CreateAddress(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	address.UserID = int32(userIdInt)
-	address, err = repository.CreateAddress(address)
+	company.UserID = int32(userIdInt)
+	company, err = company_repository.Create(company)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, address)
+	ctx.JSON(http.StatusOK, company)
 }
 
-func UpdateAddress(ctx *gin.Context) {
-	var address models.Address
+func Update(ctx *gin.Context) {
+	var company models.Company
 
-	if err := ctx.ShouldBindJSON(&address); err != nil {
+	if err := ctx.ShouldBindJSON(&company); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	token := ctx.Request.Header.Get("authorization")
 	token = token[7:]
 	userId, err := services.NewJWTService().GetUserIdFromToken(token)
@@ -61,50 +62,41 @@ func UpdateAddress(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	address.UserID = int32(userIdInt)
+	company.UserID = int32(userIdInt)
 
-	address, err = repository.UpdateAddress(address)
+	company, err = company_repository.Update(company)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, address)
+	ctx.JSON(http.StatusOK, company)
 }
 
-func GetAllAddress(ctx *gin.Context) {
-	var address []models.Address
-	token := ctx.Request.Header.Get("authorization")
-	token = token[7:]
-	userId, err := services.NewJWTService().GetUserIdFromToken(token)
-	if err != nil {
-		ctx.JSON(401, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	userIdInt, err := strconv.Atoi(userId)
+func Delete(ctx *gin.Context) {
+	userId, err := services.GetUserIdFromContext(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	address, err = repository.GetAllAddress(userIdInt)
+	strCompanyId := ctx.Param("id")
+	companyId, err := strconv.Atoi(strCompanyId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, address)
+	err = company_repository.Delete(userId, companyId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Company deleted successfully")
 }
 
-func DeleteAddress(ctx *gin.Context) {
-	addressID := ctx.Param("id")
-	addressIDInt, err := strconv.Atoi(addressID)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+func Get(ctx *gin.Context) {
 	token := ctx.Request.Header.Get("authorization")
 	token = token[7:]
 	userId, err := services.NewJWTService().GetUserIdFromToken(token)
@@ -119,11 +111,11 @@ func DeleteAddress(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err = repository.DeleteAddress(userIdInt, addressIDInt)
+	companies, err := company_repository.Get(userIdInt)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Address deleted successfully"})
+	ctx.JSON(http.StatusOK, companies)
 }

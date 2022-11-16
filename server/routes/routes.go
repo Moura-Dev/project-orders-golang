@@ -1,14 +1,18 @@
 package routes
 
 import (
-	"base-project-api/controllers"
+	"base-project-api/controllers/address_controller"
+	"base-project-api/controllers/company_controller"
+	"base-project-api/controllers/order_items_controller"
+	"base-project-api/controllers/orders_controller"
+	"base-project-api/controllers/products_controller"
+	"base-project-api/controllers/users_controller"
 	middlewares "base-project-api/server/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func ConfigRoutes(router *gin.Engine) *gin.Engine {
-	router = gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"*"}
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization", "Authentication"}
@@ -16,38 +20,45 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 	router.Use(cors.New(config))
 
 	main := router.Group("api/")
-	main.POST("/login", controllers.Login)
-	main.POST("/user", controllers.CreateUser)
+	main.POST("/login", users_controller.Login)
+	main.POST("/user", users_controller.Create)
 	{
 		routers := main.Group("/", middlewares.AuthJwt())
 		{
-			routers.GET("/", controllers.HellowControllers)
-			routers.POST("/seller", controllers.CreateSeller)
-			routers.GET("/seller/:id", controllers.GetSellerById)
-			routers.GET("/seller", controllers.GetAllSellers)
-			routers.DELETE("/seller/:id", controllers.DeleteSeller)
-			routers.GET("/user", controllers.GetUserInfo)
-			routers.GET("/company", controllers.GetAllCompany)
-			routers.POST("/company", controllers.CreateCompany)
-			routers.DELETE("/company/:id", controllers.DeleteCompany)
-			routers.PUT("/company/", controllers.UpdateCompany)
-			routers.GET("/product", controllers.GetAllProducts)
-			routers.GET("/product/:id", controllers.GetProductByID)
-			routers.POST("/product", controllers.CreateProduct)
-			routers.PUT("/product", controllers.UpdateProduct)
-			routers.DELETE("/product/:id", controllers.DeleteProduct)
-			routers.GET("/address", controllers.GetAllAddress)
-			routers.POST("/address", controllers.CreateAddress)
-			routers.PUT("/address", controllers.UpdateAddress)
-			routers.DELETE("/address/:id", controllers.DeleteAddress)
-			routers.GET("/order", controllers.GetAllOrdersByID)
-			routers.POST("/order", controllers.CreateOrder)
-			routers.PUT("/order", controllers.UpdateOrder)
-			routers.DELETE("/order/:id", controllers.DeleteOrder)
-			routers.POST("/order/:id/item", controllers.InsertItemsOrder)
-			routers.PUT("/order/:id/item", controllers.UpdateOrderItems)
-			routers.DELETE("/order/:id/item/:productID", controllers.DeleteOrderItems)
-			routers.GET("/order/:id/item", controllers.GetAllItemsInOrder)
+			// Users
+			routers.DELETE("/user/:id", users_controller.Delete)
+			routers.GET("/user/:id", users_controller.Get)
+
+			// Companies
+			routers.DELETE("/company/:id", company_controller.Delete)
+			routers.GET("/company", company_controller.Get)
+			routers.POST("/company", company_controller.Create)
+			routers.PUT("/company/", company_controller.Update)
+
+			// Products
+			routers.GET("/product/:id", products_controller.Get)
+			routers.DELETE("/product/:id", products_controller.Delete)
+			routers.POST("/product", products_controller.Create)
+			routers.PUT("/product", products_controller.Update)
+			routers.GET("/product", products_controller.GetArray)
+
+			// Address
+			routers.DELETE("/address/:id", address_controller.Delete)
+			routers.GET("/address", address_controller.Get)
+			routers.POST("/address", address_controller.Create)
+			routers.PUT("/address", address_controller.Update)
+
+			// Orders
+			routers.DELETE("/order/:id", orders_controller.Delete)
+			routers.GET("/order", orders_controller.Get)
+			routers.POST("/order", orders_controller.Create)
+			routers.PUT("/order", orders_controller.Update)
+
+			// Items
+			routers.DELETE("/order/:id/item/:productID", order_items_controller.Delete)
+			routers.GET("/order/:id/item", order_items_controller.Get)
+			routers.POST("/order/:id/item", order_items_controller.Create)
+			routers.PUT("/order/:id/item", order_items_controller.Update)
 
 		}
 	}
