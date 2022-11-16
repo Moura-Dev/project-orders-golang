@@ -1,12 +1,11 @@
-PKGS ?= $(shell go list ./...)
-POSTGRESQL_URL ?= postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+include .env
 .PHONY: all services clean
 
 migrate_up:
-	migrate -database ${POSTGRESQL_URL} -path db/migrations up
+	docker run -v $(shell pwd)/db/migrations:/migrations --network host migrate/migrate -path migrations -database ${DB_URL} up
 
 migrate_down:
-	migrate -database ${POSTGRESQL_URL} -path db/migrations down
+	docker run -v $(shell pwd)/db/migrations:/migrations --network host migrate/migrate -path migrations -database ${DB_URL} down -all
 
 down:
 	docker-compose down && docker volume prune -f
