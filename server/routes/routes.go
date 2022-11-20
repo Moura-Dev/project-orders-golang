@@ -1,15 +1,16 @@
 package routes
 
 import (
-	"base-project-api/controllers/address_controller"
-	"base-project-api/controllers/company_controller"
-	"base-project-api/controllers/order_items_controller"
-	"base-project-api/controllers/orders_controller"
-	"base-project-api/controllers/products_controller"
-	"base-project-api/controllers/users_controller"
-	middlewares "base-project-api/server/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	"github.com/moura-dev/project-orders-golang/controllers/address_controller"
+	"github.com/moura-dev/project-orders-golang/controllers/company_controller"
+	"github.com/moura-dev/project-orders-golang/controllers/order_items_controller"
+	"github.com/moura-dev/project-orders-golang/controllers/orders_controller"
+	"github.com/moura-dev/project-orders-golang/controllers/products_controller"
+	"github.com/moura-dev/project-orders-golang/controllers/users_controller"
+	middlewares "github.com/moura-dev/project-orders-golang/server/middleware"
 )
 
 func ConfigRoutes(router *gin.Engine) *gin.Engine {
@@ -32,8 +33,8 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 			// Companies
 			routers.DELETE("/company/:id", company_controller.Delete)
 			routers.GET("/company", company_controller.Get)
-			routers.POST("/company", company_controller.Create)
-			routers.PUT("/company/", company_controller.Update)
+			//routers.POST("/company", company_controller.Create)
+			//routers.PUT("/company/", company_controller.Update)
 
 			// Products
 			routers.GET("/product/:id", products_controller.Get)
@@ -50,7 +51,7 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 
 			// Orders
 			routers.DELETE("/order/:id", orders_controller.Delete)
-			routers.GET("/order", orders_controller.Get)
+			//routers.GET("/order", orders_controller.Get)
 			routers.POST("/order", orders_controller.Create)
 			routers.PUT("/order", orders_controller.Update)
 

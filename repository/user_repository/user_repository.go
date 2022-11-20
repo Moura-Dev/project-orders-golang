@@ -1,23 +1,45 @@
 package user_repository
 
 import (
-	"base-project-api/db"
-	"base-project-api/models"
+	"context"
+	"fmt"
+	"github.com/moura-dev/project-orders-golang/db"
+	"github.com/moura-dev/project-orders-golang/models"
+	"time"
 )
 
-func Create(user models.User) (models.User, error) {
+func Create(ctx context.Context, user models.User) (models.User, error) {
+	writeCtx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
 
-	_, err := db.Conn.NamedExec("INSERT INTO users (first_name, last_name, email, login, password) VALUES (:first_name, :last_name, :email, :login, :password)", user)
+	tx, err := db.Conn.Begin()
 	if err != nil {
+		fmt.Printf("\nError connecting to the database: %s\n", err)
+		return user, err
+	}
+	defer db.Rollback(tx)
+
+	if err = tx.QueryRowContext(writeCtx, `
+			INSERT INTO users (name, email, login, password) 
+			VALUES ($1, $2, $3, $4) 
+			RETURNING id;`,
+		user.Name, user.Email, user.Login, user.Password).
+		Scan(&user.Id); err != nil {
+		return models.User{}, err
+	}
+
+	if commitErr := tx.Commit(); commitErr != nil {
+		fmt.Printf("\nError connecting to the database: %v\n", err)
 		return user, err
 	}
 
 	return user, nil
 }
 
-func Get(userId int) (user models.User, err error) {
+func Get(userId int) (models.User, error) {
+	var user models.User
 
-	err = db.Conn.Get(&user, "SELECT * FROM users WHERE id = $1", userId)
+	err := db.Conn.Get(&user, "SELECT id, name, email, created_at, updated_at FROM users WHERE id = $1", userId)
 	if err != nil {
 		return user, err
 	}
@@ -26,8 +48,20 @@ func Get(userId int) (user models.User, err error) {
 }
 
 func Delete(userId int) error {
-	_, err := db.Conn.Exec("DELETE FROM sellers WHERE id = $1", userId)
+
+	tx, err := db.StartTransaction()
 	if err != nil {
+		return err
+	}
+
+	_ = db.Conn.QueryRow("DELETE FROM users WHERE id = $1", userId)
+
+	err = db.CommitTransaction(tx)
+	if err != nil {
+		err = db.RollbackTransaction(tx)
+		if err != nil {
+			return err
+		}
 		return err
 	}
 
@@ -37,7 +71,7 @@ func Delete(userId int) error {
 func Login(login string) (models.User, error) {
 	var user models.User
 
-	err := db.Conn.Get(&user, "SELECT * FROM users WHERE login = $1", login)
+	err := db.Conn.Get(&user, "SELECT name, password FROM users WHERE login = $1;", login)
 	if err != nil {
 		return user, err
 	}

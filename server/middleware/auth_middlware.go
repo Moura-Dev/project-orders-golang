@@ -1,8 +1,9 @@
 package middlewares
 
 import (
-	"base-project-api/services"
 	"github.com/gin-gonic/gin"
+
+	"github.com/moura-dev/project-orders-golang/services"
 )
 
 func AuthJwt() gin.HandlerFunc {
@@ -16,6 +17,8 @@ func AuthJwt() gin.HandlerFunc {
 			ctx.AbortWithStatus(401)
 			return
 		}
+		ValidateTokenLength(ctx, authorization)
+
 		token := authorization[7:]
 
 		if !services.NewJWTService().ValidateToken(token) {
@@ -26,4 +29,15 @@ func AuthJwt() gin.HandlerFunc {
 			return
 		}
 	}
+}
+
+func ValidateTokenLength(ctx *gin.Context, authorization string) {
+	if len([]rune(authorization)) <= 6 {
+		ctx.JSON(401, gin.H{
+			"message": "Invalid Token",
+		})
+		ctx.AbortWithStatus(401)
+		return
+	}
+	return
 }

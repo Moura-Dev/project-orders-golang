@@ -1,11 +1,13 @@
 package order_items_controller
 
 import (
-	"base-project-api/models"
-	"base-project-api/repository/order_items_repository"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/moura-dev/project-orders-golang/models"
+	"github.com/moura-dev/project-orders-golang/repository/order_items_repository"
 )
 
 func Create(ctx *gin.Context) {

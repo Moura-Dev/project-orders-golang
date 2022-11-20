@@ -1,9 +1,10 @@
 package main
 
 import (
-	"base-project-api/db"
-	"base-project-api/server"
 	"github.com/joho/godotenv"
+
+	"github.com/moura-dev/project-orders-golang/db"
+	"github.com/moura-dev/project-orders-golang/server"
 )
 
 func main() {

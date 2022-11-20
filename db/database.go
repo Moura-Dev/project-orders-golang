@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -63,4 +64,14 @@ func RollbackTransaction(tx *sqlx.Tx) error {
 		return err
 	}
 	return err
+}
+
+// Rollback - DB rollback with logger and retry
+func Rollback(tx *sql.Tx) {
+	if err := tx.Rollback(); err != nil {
+		if err := tx.Rollback(); err != nil {
+			fmt.Printf("Error connecting to the database: %s", err)
+			return
+		}
+	}
 }

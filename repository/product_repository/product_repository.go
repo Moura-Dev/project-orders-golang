@@ -1,8 +1,8 @@
 package product_repository
 
 import (
-	"base-project-api/db"
-	"base-project-api/models"
+	"github.com/moura-dev/project-orders-golang/db"
+	"github.com/moura-dev/project-orders-golang/models"
 )
 
 func Create(product models.Product) (models.Product, error) {

@@ -1,20 +1,18 @@
 package products_controller
 
 import (
-	"base-project-api/models"
-	"base-project-api/repository/product_repository"
-	"base-project-api/services"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/moura-dev/project-orders-golang/models"
+	"github.com/moura-dev/project-orders-golang/repository/product_repository"
+	"github.com/moura-dev/project-orders-golang/services"
 )
 
 func Get(ctx *gin.Context) {
-	userId, err := services.GetUserIdFromContext(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	userId := services.GetUserIdFromContext(ctx)
 
 	var product models.Product
 
@@ -31,11 +29,7 @@ func Get(ctx *gin.Context) {
 }
 
 func GetArray(ctx *gin.Context) {
-	userId, err := services.GetUserIdFromContext(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	userId := services.GetUserIdFromContext(ctx)
 
 	products, err := product_repository.GetArray(userId)
 	if err != nil {
@@ -47,11 +41,7 @@ func GetArray(ctx *gin.Context) {
 }
 
 func Create(ctx *gin.Context) {
-	userId, err := services.GetUserIdFromContext(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	userId := services.GetUserIdFromContext(ctx)
 
 	var product models.Product
 
@@ -62,7 +52,7 @@ func Create(ctx *gin.Context) {
 
 	product.UserId = int32(userId)
 
-	product, err = product_repository.Create(product)
+	product, err := product_repository.Create(product)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -72,20 +62,17 @@ func Create(ctx *gin.Context) {
 }
 
 func Update(ctx *gin.Context) {
-	userId, err := services.GetUserIdFromContext(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	userId := services.GetUserIdFromContext(ctx)
+
 	var product models.Product
 
-	if err = ctx.ShouldBindJSON(&product); err != nil {
+	if err := ctx.ShouldBindJSON(&product); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	product.UserId = int32(userId)
-	product, err = product_repository.Update(product)
+	product, err := product_repository.Update(product)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -95,11 +82,7 @@ func Update(ctx *gin.Context) {
 }
 
 func Delete(ctx *gin.Context) {
-	userId, err := services.GetUserIdFromContext(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	userId := services.GetUserIdFromContext(ctx)
 
 	strProductId := ctx.Param("id")
 	productId, err := strconv.Atoi(strProductId)

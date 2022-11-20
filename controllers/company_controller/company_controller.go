@@ -1,12 +1,14 @@
 package company_controller
 
 import (
-	"base-project-api/models"
-	"base-project-api/repository/company_repository"
-	"base-project-api/services"
-	"github.com/gin-gonic/gin"
+	"github.com/moura-dev/project-orders-golang/models"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/moura-dev/project-orders-golang/repository/company_repository"
+	"github.com/moura-dev/project-orders-golang/services"
 )
 
 func Create(ctx *gin.Context) {
@@ -16,22 +18,10 @@ func Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token := ctx.Request.Header.Get("authorization")
-	token = token[7:]
-	userId, err := services.NewJWTService().GetUserIdFromToken(token)
-	if err != nil {
-		ctx.JSON(401, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	company.UserID = int32(userIdInt)
-	company, err = company_repository.Create(company)
+
+	userId := services.GetUserIdFromContext(ctx)
+
+	company, err := company_repository.Create(userId, company)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -48,23 +38,7 @@ func Update(ctx *gin.Context) {
 		return
 	}
 
-	token := ctx.Request.Header.Get("authorization")
-	token = token[7:]
-	userId, err := services.NewJWTService().GetUserIdFromToken(token)
-	if err != nil {
-		ctx.JSON(401, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	company.UserID = int32(userIdInt)
-
-	company, err = company_repository.Update(company)
+	company, err := company_repository.Update(company)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -74,11 +48,7 @@ func Update(ctx *gin.Context) {
 }
 
 func Delete(ctx *gin.Context) {
-	userId, err := services.GetUserIdFromContext(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	userId := services.GetUserIdFromContext(ctx)
 
 	strCompanyId := ctx.Param("id")
 	companyId, err := strconv.Atoi(strCompanyId)
@@ -97,21 +67,9 @@ func Delete(ctx *gin.Context) {
 }
 
 func Get(ctx *gin.Context) {
-	token := ctx.Request.Header.Get("authorization")
-	token = token[7:]
-	userId, err := services.NewJWTService().GetUserIdFromToken(token)
-	if err != nil {
-		ctx.JSON(401, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	companies, err := company_repository.Get(userIdInt)
+	userId := services.GetUserIdFromContext(ctx)
+
+	companies, err := company_repository.Get(userId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -1,16 +1,21 @@
 package company_repository
 
 import (
-	"base-project-api/db"
-	"base-project-api/models"
+	"github.com/moura-dev/project-orders-golang/db"
+	"github.com/moura-dev/project-orders-golang/models"
 )
 
-func Create(company models.Company) (models.Company, error) {
-
-	_, err := db.Conn.NamedExec("INSERT INTO companies (user_id,address_id, phone_id, name, cnpj, fantasy_name, ie, logo) VALUES (:user_id, phone_id, :name, :cnpj, :fantasy_name, :ie, :logo, :address_id);", company)
+func Create(userId int, company models.Company) (models.Company, error) {
+	_, err := db.Conn.NamedExec("INSERT INTO companies (created_at, updated_at) VALUES (NOW(), NOW());", company)
 	if err != nil {
 		return company, err
 	}
+
+	_, err = db.Conn.Exec("INSERT INTO user_companies (company_id, user_id) VALUES ($1, $2);", company.Id, userId)
+	if err != nil {
+		return company, err
+	}
+
 	return company, nil
 }
 
@@ -22,8 +27,8 @@ func Update(company models.Company) (models.Company, error) {
 	return company, nil
 }
 
-func Delete(userID int, companyIDInt int) error {
-	_, err := db.Conn.Exec("DELETE FROM companies WHERE user_id = $1 AND id = $2;", userID, companyIDInt)
+func Delete(userID int, companyId int) error {
+	_, err := db.Conn.Exec("DELETE FROM companies WHERE id = $1", companyId)
 	if err != nil {
 		return err
 	}
@@ -32,7 +37,7 @@ func Delete(userID int, companyIDInt int) error {
 
 func Get(userID int) ([]models.Company, error) {
 	var companies []models.Company
-	err := db.Conn.Select(&companies, "SELECT * FROM companies WHERE user_id = $1", userID)
+	err := db.Conn.Select(&companies, "SELECT id FROM companies c JOIN user_companies uc on c.id = uc.company_id WHERE user_id = $1", userID)
 	if err != nil {
 		return companies, err
 	}

@@ -1,12 +1,14 @@
 package address_controller
 
 import (
-	"base-project-api/models"
-	"base-project-api/repository/address_repository"
-	"base-project-api/services"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/moura-dev/project-orders-golang/models"
+	"github.com/moura-dev/project-orders-golang/repository/address_repository"
+	"github.com/moura-dev/project-orders-golang/services"
 )
 
 func Create(ctx *gin.Context) {
@@ -16,22 +18,12 @@ func Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token := ctx.Request.Header.Get("authorization")
-	token = token[7:]
-	userId, err := services.NewJWTService().GetUserIdFromToken(token)
-	if err != nil {
-		ctx.JSON(401, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	address.UserId = int32(userIdInt)
-	address, err = address_repository.Create(address)
+
+	userId := services.GetUserIdFromContext(ctx)
+
+	address.UserId = int32(userId)
+
+	address, err := address_repository.Create(address)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

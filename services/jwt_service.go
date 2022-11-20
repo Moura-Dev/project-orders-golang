@@ -6,10 +6,12 @@ import (
 	"strconv"
 	"time"
 
+	middlewares "github.com/moura-dev/project-orders-golang/server/middleware"
+
 	"github.com/golang-jwt/jwt"
 )
 
-type jwtService struct {
+type JwtService struct {
 	secret string
 	issure string
 }
@@ -18,14 +20,14 @@ type Claim struct {
 	jwt.StandardClaims
 }
 
-func NewJWTService() *jwtService {
-	return &jwtService{
+func NewJWTService() *JwtService {
+	return &JwtService{
 		secret: "secret-key",
 		issure: "orders-api",
 	}
 }
 
-func (s *jwtService) GenerateToken(userID int) (string, error) {
+func (s *JwtService) GenerateToken(userID int) (string, error) {
 	userIDStr := strconv.Itoa(userID)
 
 	claim := Claim{
@@ -46,7 +48,7 @@ func (s *jwtService) GenerateToken(userID int) (string, error) {
 	return tokenEncode, nil
 }
 
-func (s *jwtService) ValidateToken(token string) bool {
+func (s *JwtService) ValidateToken(token string) bool {
 	_, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, isValid := t.Method.(*jwt.SigningMethodHMAC); !isValid {
 			return nil, fmt.Errorf("invalid token: %v", token)
@@ -58,7 +60,7 @@ func (s *jwtService) ValidateToken(token string) bool {
 	return err == nil
 }
 
-func (s *jwtService) GetUserIdFromToken(t string) (string, error) {
+func (s *JwtService) GetUserIdFromToken(t string) (string, error) {
 	tokenString := t
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -71,19 +73,22 @@ func (s *jwtService) GetUserIdFromToken(t string) (string, error) {
 	return "", err
 }
 
-func GetUserIdFromContext(ctx *gin.Context) (int, error) {
-	token := ctx.Request.Header.Get("authorization")
+func GetUserIdFromContext(ctx *gin.Context) int {
+	token := ctx.Request.Header.Get("Authorization")
+	middlewares.ValidateTokenLength(ctx, token)
+
 	token = token[7:]
+
 	userId, err := NewJWTService().GetUserIdFromToken(token)
 	if err != nil {
 		ctx.JSON(401, gin.H{
 			"error": err.Error(),
 		})
-		return 0, nil
+		return 0
 	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return 0, err
+		return 0
 	}
-	return userIdInt, err
+	return userIdInt
 }

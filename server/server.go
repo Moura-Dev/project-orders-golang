@@ -1,12 +1,14 @@
 package server
 
 import (
-	"base-project-api/server/routes"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/moura-dev/project-orders-golang/server/routes"
 )
 
 type Server struct {
