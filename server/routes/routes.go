@@ -10,7 +10,7 @@ import (
 	"github.com/moura-dev/project-orders-golang/controllers/orders_controller"
 	"github.com/moura-dev/project-orders-golang/controllers/products_controller"
 	"github.com/moura-dev/project-orders-golang/controllers/users_controller"
-	middlewares "github.com/moura-dev/project-orders-golang/server/middleware"
+	"github.com/moura-dev/project-orders-golang/server/middleware"
 )
 
 func ConfigRoutes(router *gin.Engine) *gin.Engine {
@@ -60,7 +60,6 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 			routers.GET("/order/:id/item", order_items_controller.Get)
 			routers.POST("/order/:id/item", order_items_controller.Create)
 			routers.PUT("/order/:id/item", order_items_controller.Update)
-
 		}
 	}
 	return router

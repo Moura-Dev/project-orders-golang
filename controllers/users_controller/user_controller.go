@@ -11,7 +11,6 @@ import (
 )
 
 func Get(ctx *gin.Context) {
-
 	userId := services.GetUserIdFromContext(ctx)
 
 	user, err := user_repository.Get(userId)
@@ -78,7 +77,7 @@ func Login(ctx *gin.Context) { // Get User in db
 		return
 	}
 
-	token, err := services.NewJWTService().GenerateToken(int(user.Id))
+	token, err := services.NewJWTService().GenerateToken(user.Id)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),

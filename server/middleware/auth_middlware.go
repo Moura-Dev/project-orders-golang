@@ -17,7 +17,7 @@ func AuthJwt() gin.HandlerFunc {
 			ctx.AbortWithStatus(401)
 			return
 		}
-		ValidateTokenLength(ctx, authorization)
+		services.ValidateTokenLength(ctx, authorization)
 
 		token := authorization[7:]
 
@@ -29,15 +29,4 @@ func AuthJwt() gin.HandlerFunc {
 			return
 		}
 	}
-}
-
-func ValidateTokenLength(ctx *gin.Context, authorization string) {
-	if len([]rune(authorization)) <= 6 {
-		ctx.JSON(401, gin.H{
-			"message": "Invalid Token",
-		})
-		ctx.AbortWithStatus(401)
-		return
-	}
-	return
 }

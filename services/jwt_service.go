@@ -2,12 +2,10 @@ package services
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"strconv"
 	"time"
 
-	middlewares "github.com/moura-dev/project-orders-golang/server/middleware"
-
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -75,7 +73,7 @@ func (s *JwtService) GetUserIdFromToken(t string) (string, error) {
 
 func GetUserIdFromContext(ctx *gin.Context) int {
 	token := ctx.Request.Header.Get("Authorization")
-	middlewares.ValidateTokenLength(ctx, token)
+	ValidateTokenLength(ctx, token)
 
 	token = token[7:]
 
@@ -91,4 +89,15 @@ func GetUserIdFromContext(ctx *gin.Context) int {
 		return 0
 	}
 	return userIdInt
+}
+
+func ValidateTokenLength(ctx *gin.Context, authorization string) {
+	if len([]rune(authorization)) <= 6 {
+		ctx.JSON(401, gin.H{
+			"message": "Invalid Token",
+		})
+		ctx.AbortWithStatus(401)
+		return
+	}
+	return
 }

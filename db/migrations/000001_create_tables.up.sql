@@ -1,107 +1,207 @@
-CREATE TABLE IF NOT EXISTS phones
-(
-    id              SERIAL PRIMARY KEY,
-    first_phone     VARCHAR(255),
-    secondary_phone VARCHAR(255),
-    created_at      TIMESTAMP default NOW(),
-    updated_at      TIMESTAMP default NOW()
-);
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-CREATE TABLE IF NOT EXISTS addresses
+CREATE TABLE IF NOT EXISTS contacts
 (
-    id           SERIAL PRIMARY KEY,
-    street       VARCHAR(255) NOT NULL,
-    number       VARCHAR(255) NOT NULL,
-    zip_code     VARCHAR(255),
-    city         VARCHAR(255) NOT NULL,
-    state        VARCHAR(255) NOT NULL,
-    district     VARCHAR(255),
-    reference    VARCHAR(255),
-    address_name VARCHAR(255),
-    created_at   TIMESTAMP default NOW(),
-    updated_at   TIMESTAMP default NOW()
-);
+    id           SERIAL PRIMARY KEY NOT NULL,
+    name         TEXT,
+    website      TEXT,
+    cnpj_cpf     TEXT,
+    address      TEXT,
+    telephone    TEXT,
+    logo_url     TEXT,
+    fantasy_name TEXT,
+    ie           TEXT,
+    email        TEXT,
+    created_at   TIMESTAMP DEFAULT NOW(),
+    updated_at   TIMESTAMP DEFAULT NOW()
+    );
 
-CREATE TABLE IF NOT EXISTS users
-(
-    id         SERIAL PRIMARY KEY,
-    address_id INT,
-    phone_id   INT,
-    first_name VARCHAR(255)           NOT NULL,
-    last_name  VARCHAR(255)           NOT NULL,
-    email      VARCHAR(255)           NOT NULL,
-    login      VARCHAR(255) unique    NOT NULL,
-    password   VARCHAR(255)           NOT NULL,
-    active     BOOLEAN   default True NOT NULL,
-    created_at TIMESTAMP default NOW(),
-    updated_at TIMESTAMP default NOW(),
-    FOREIGN KEY (phone_id) REFERENCES phones (id) ON DELETE CASCADE,
-    FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE CASCADE
-);
+CREATE OR REPLACE TRIGGER set_timestamp
+    BEFORE UPDATE ON contacts
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE IF NOT EXISTS companies
 (
-    id           SERIAL PRIMARY KEY,
-    user_id      INT          NOT NULL,
-    address_id   INT,
-    phone_id     INT,
-    name         VARCHAR(255) NOT NULL,
-    cnpj         VARCHAR(255) NOT NULL,
-    fantasy_name VARCHAR(255) NOT NULL,
-    ie           VARCHAR(255),
-    logo         VARCHAR(255),
-    created_at   TIMESTAMP default NOW(),
-    updated_at   TIMESTAMP default NOW(),
+    id         SERIAL PRIMARY KEY NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+    );
+
+CREATE TABLE IF NOT EXISTS users
+(
+    id         SERIAL PRIMARY KEY NOT NULL,
+    name       TEXT,
+    email      TEXT,
+    login      TEXT,
+    password   TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+    );
+
+CREATE OR REPLACE TRIGGER set_timestamp
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE IF NOT EXISTS user_companies
+(
+    company_id INT NOT NULL,
+    user_id    INT NOT NULL,
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (phone_id) REFERENCES phones (id) ON DELETE CASCADE,
-    FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE CASCADE
+    PRIMARY KEY (company_id, user_id)
 );
 
-CREATE TYPE shippingType AS ENUM ('CIF', 'FOB');
+CREATE TABLE IF NOT EXISTS factories
+(
+    id         SERIAL PRIMARY KEY NOT NULL,
+    company_id INT NOT NULL,
+    contact_id INT,
+    name       TEXT,
+    telephone  TEXT,
+    email      TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES contacts (id) ON DELETE CASCADE
+);
 
-CREATE TYPE status AS ENUM ('QUOTE', 'APPROVED', 'CANCELLED');
+CREATE OR REPLACE TRIGGER set_timestamp
+    BEFORE UPDATE ON factories
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE IF NOT EXISTS available_factories_by_company
+(
+    company_id INT NOT NULL,
+    factory_id INT NOT NULL,
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (factory_id) REFERENCES factories (id) ON DELETE CASCADE,
+    PRIMARY KEY (company_id, factory_id)
+
+);
+
+CREATE TABLE IF NOT EXISTS costumers
+(
+    id         SERIAL PRIMARY KEY NOT NULL,
+    company_id INT NOT NULL,
+    contact_id INT NOT NULL,
+    name       TEXT,
+    telephone  TEXT,
+    email      TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES contacts (id) ON DELETE CASCADE
+);
+
+CREATE OR REPLACE TRIGGER set_timestamp
+    BEFORE UPDATE ON costumers
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE IF NOT EXISTS catalogs
+(
+    id         SERIAL PRIMARY KEY NOT NULL,
+    company_id INT NOT NULL,
+    factory_id INT NOT NULL,
+    name       TEXT,
+    year       TIMESTAMP,
+    month      TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (factory_id) REFERENCES factories (id) ON DELETE CASCADE
+);
+
+CREATE OR REPLACE TRIGGER set_timestamp
+    BEFORE UPDATE ON catalogs
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE IF NOT EXISTS available_catalogs_by_company
+(
+    company_id INT NOT NULL,
+    catalog_id INT NOT NULL,
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (catalog_id) REFERENCES catalogs (id) ON DELETE CASCADE,
+    PRIMARY KEY (company_id, catalog_id)
+);
+
+CREATE TABLE IF NOT EXISTS items
+(
+    id          SERIAL PRIMARY KEY NOT NULL,
+    company_id  INT NOT NULL,
+    catalog_id  INT NOT NULL,
+    factory_id  INT NOT NULL,
+    name        TEXT,
+    code        TEXT,
+    reference   TEXT,
+    description TEXT,
+    image_url   TEXT,
+    created_at  TIMESTAMP DEFAULT NOW(),
+    updated_at  TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (catalog_id) REFERENCES catalogs  (id) ON DELETE CASCADE,
+    FOREIGN KEY (factory_id) REFERENCES factories (id) ON DELETE CASCADE
+);
+
+CREATE OR REPLACE TRIGGER set_timestamp
+    BEFORE UPDATE ON items
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE IF NOT EXISTS orders
 (
-    id                  SERIAL PRIMARY KEY,
-    user_id             INT          NOT NULL,
-    shipping_company_id INT,
-    customer_id         INT          NOT NULL,
-    status              status       NOT NULL,
-    shipping_type       shippingType NOT NULL,
-    purchaser           VARCHAR(255),
-    observation         VARCHAR(255),
-    created_at          TIMESTAMP default NOW(),
-    updated_at          TIMESTAMP default NOW(),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (customer_id) REFERENCES companies (id) ON DELETE CASCADE
+    id          SERIAL PRIMARY KEY NOT NULL,
+    company_id  INT NOT NULL,
+    costumer_id INT NOT NULL,
+    factory_id  INT NOT NULL,
+    created_at  TIMESTAMP DEFAULT NOW(),
+    updated_at  TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (costumer_id) REFERENCES costumers (id) ON DELETE CASCADE,
+    FOREIGN KEY (factory_id) REFERENCES factories (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS products
-(
-    id          SERIAL PRIMARY KEY,
-    user_id     INT                    NOT NULL,
-    company_id  INT                    NOT NULL,
-    name        VARCHAR(255)           NOT NULL,
-    description VARCHAR(255),
-    cod         VARCHAR(255),
-    price       DECIMAL(10, 2)         NOT NULL,
-    ipi         DECIMAL(10, 2),
-    active      BOOLEAN   default True NOT NULL,
-    created_at  TIMESTAMP default NOW(),
-    updated_at  TIMESTAMP default NOW(),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
-);
+CREATE OR REPLACE TRIGGER set_timestamp
+    BEFORE UPDATE ON orders
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE IF NOT EXISTS order_items
 (
-    id         SERIAL PRIMARY KEY,
-    order_id   INT            NOT NULL,
-    product_id INT            NOT NULL,
-    quantity   INT            NOT NULL,
-    price      DECIMAL(10, 2) NOT NULL,
-    discount   DECIMAL(10, 2) NOT NULL,
+    company_id INT NOT NULL,
+    order_id   INT NOT NULL,
+    item_id    INT NOT NULL,
+    quantity   INT,
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
     FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+    PRIMARY KEY (company_id, order_id, item_id)
 );
+
+CREATE TABLE IF NOT EXISTS item_prices
+(
+    company_id INT NOT NULL,
+    item_id    INT NOT NULL,
+    price      DECIMAL(10, 2) CONSTRAINT price_non_negative_value CHECK (price >= 0),
+    ipi        INT CONSTRAINT ipi_non_negative_value CHECK (ipi >= 0),
+    created_at  TIMESTAMP DEFAULT NOW(),
+    updated_at  TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
+    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    PRIMARY KEY (company_id, item_id)
+);
+
+CREATE OR REPLACE TRIGGER set_timestamp
+    BEFORE UPDATE ON item_prices
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();

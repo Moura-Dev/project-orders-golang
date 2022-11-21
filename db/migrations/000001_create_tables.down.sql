@@ -1,3 +1,15 @@
-DROP TABLE IF EXISTS users, addresses, companies, orders, products, order_items, phones;
-
-DROP TYPE IF EXISTS status, shippingtype;
+DROP TABLE IF EXISTS
+    users,
+    companies,
+    orders,
+    order_items,
+    factories,
+    user_companies,
+    item_prices,
+    costumers,
+    contacts,
+    catalogs,
+    items,
+    available_factories_by_company,
+    available_catalogs_by_company,
+    schema_migrations;

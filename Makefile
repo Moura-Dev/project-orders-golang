@@ -1,5 +1,4 @@
-PKGS ?= $(shell go list ./...)
-POSTGRESQL_URL ?= postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+include .env
 .PHONY: all services clean
 
 migrate_up:

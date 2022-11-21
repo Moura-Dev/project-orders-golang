@@ -1,216 +1,127 @@
-CREATE TABLE IF NOT EXISTS contacts (
-    id SERIAL PRIMARY KEY,
-    name         TEXT,
-    website      TEXT,
-    cnpj_cpf     TEXT,
-    address      TEXT,
-    telephone    TEXT,
-    logo_url     TEXT,
-    fantasy_name TEXT,
-    ie           TEXT,
-    email        TEXT,
-    created_at   TIMESTAMP DEFAULT NOW(),
-    updated_at   TIMESTAMP DEFAULT NOW()
-);
+INSERT INTO companies (created_at, updated_at) VALUES (NOW(), NOW()) RETURNING *; -- 1 Representante
+INSERT INTO companies (created_at, updated_at) VALUES (NOW(), NOW()) RETURNING *; -- 2 Representante
+INSERT INTO companies (created_at, updated_at) VALUES (NOW(), NOW()) RETURNING *; -- 3 Representante
+INSERT INTO companies (created_at, updated_at) VALUES (NOW(), NOW()) RETURNING *; -- 4 Representante
 
-CREATE TABLE IF NOT EXISTS companies
-(
-    id           SERIAL PRIMARY KEY,
-    created_at   TIMESTAMP DEFAULT NOW(),
-    updated_at   TIMESTAMP DEFAULT NOW()
-);
+INSERT INTO factories (company_id, name, telephone, email) VALUES (1, 'Moureili', '30758452', 'moureli@gmail.com') RETURNING *;
+INSERT INTO factories (company_id, name, telephone, email) VALUES (2, 'Nike', '9998888', 'nike@company.com') RETURNING *;
+INSERT INTO factories (company_id, name, telephone, email) VALUES (3, 'Razer', '6663333', 'razer@mtcaro.com') RETURNING *;
+INSERT INTO factories (company_id, name, telephone, email) VALUES (4, 'Bulb', '6663333', 'bulb@mtcaro.com') RETURNING *;
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+-- Factories criados por um representante e que são disponíveis para um outro representante.
+INSERT INTO available_factories_by_company (factory_id, company_id) VALUES (1, 3) RETURNING *;
+INSERT INTO available_factories_by_company (factory_id, company_id) VALUES (2, 3) RETURNING *;
+INSERT INTO available_factories_by_company (factory_id, company_id) VALUES (3, 4) RETURNING *;
 
-CREATE TABLE IF NOT EXISTS users
-(
-    id              SERIAL PRIMARY KEY,
-    name            TEXT,
-    email           TEXT,
-    login           TEXT,
-    password        TEXT,
-    created_at      TIMESTAMP DEFAULT NOW(),
-    updated_at      TIMESTAMP DEFAULT NOW()
+DELETE FROM available_factories_by_company WHERE company_id = 3 AND factory_id = 1;
+DELETE FROM available_factories_by_company WHERE company_id = 3 AND factory_id = 2;
+DELETE FROM available_factories_by_company WHERE company_id = 3 AND factory_id = 4;
 
-);
+select * from available_factories_by_company;
+SELECT * from factories;
 
-CREATE TABLE IF NOT EXISTS user_companies
-(
-    company_id INT,
-    user_id INT,
-    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+SELECT f.id as factory_id, f.name as factory_name  FROM factories f
+WHERE f.company_id IN (
+    SELECT factory_id FROM available_factories_by_company afbc
+    WHERE afbc.company_id = 3
+) OR f.company_id = 3;
 
-);
+INSERT INTO catalogs (factory_id, company_id, name, year, month) VALUES (1, 1, 'tubos', NOW(), NOW()) RETURNING *;
+INSERT INTO catalogs (factory_id, company_id, name, year, month) VALUES (2, 2, 'tênis', NOW(), NOW()) RETURNING *;
+INSERT INTO catalogs (factory_id, company_id, name, year, month) VALUES (3, 3, 'teclados', NOW(), NOW()) RETURNING *;
+INSERT INTO catalogs (factory_id, company_id, name, year, month) VALUES (4, 4, 'lampadas', NOW(), NOW()) RETURNING *;
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+-- Catálogos criados por um representante e que são disponíveis para um outro representante.
+INSERT INTO available_catalogs_by_company (catalog_id, company_id) VALUES (1, 3) RETURNING *;
+INSERT INTO available_catalogs_by_company (catalog_id, company_id) VALUES (2, 3) RETURNING *;
+INSERT INTO available_catalogs_by_company (catalog_id, company_id) VALUES (4, 3) RETURNING *;
 
-CREATE TABLE IF NOT EXISTS factories
-(
-    id         SERIAL PRIMARY KEY,
-    company_id INT,
-    contact_id INT,
-    name       TEXT,
-    telephone  TEXT,
-    email      TEXT,
-    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
-    FOREIGN KEY (contact_id) REFERENCES contacts (id) ON DELETE CASCADE
-);
+DELETE FROM available_catalogs_by_company WHERE company_id = 3 AND catalog_id = 1;
+DELETE FROM available_catalogs_by_company WHERE company_id = 3 AND catalog_id = 2;
+DELETE FROM available_catalogs_by_company WHERE company_id = 3 AND catalog_id = 4;
 
-CREATE TABLE IF NOT EXISTS costumers
-(
-    id         SERIAL PRIMARY KEY,
-    company_id INT,
-    contact_id INT,
-    name       TEXT,
-    telephone  TEXT,
-    email      TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
-    FOREIGN KEY (contact_id) REFERENCES contacts (id) ON DELETE CASCADE
-);
+select * from available_catalogs_by_company;
+select * from catalogs;
 
-CREATE TABLE IF NOT EXISTS catalogs
-(
-    id         SERIAL PRIMARY KEY,
-    company_id INT,
-    factory_id INT,
-    name       TEXT,
-    year       TIMESTAMP,
-    month      TIMESTAMP,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
-    FOREIGN KEY (factory_id) REFERENCES factories (id) ON DELETE CASCADE
-);
+SELECT f.id             AS catalog_id,
+       c.name           AS catalog_name,
+       f.name           AS factory_name,
+       f.company_id     AS f_company_id,
+       c.company_id     AS c_company_id
+FROM catalogs c
+    JOIN factories f ON c.factory_id = f.id
+WHERE c.company_id IN (
+        SELECT a.catalog_id FROM available_catalogs_by_company a WHERE a.company_id = 3
+    )
+OR c.company_id = 3;
 
-CREATE TABLE IF NOT EXISTS items
-(
-    id          SERIAL PRIMARY KEY,
-    company_id INT,
-    catalog_id  INT,
-    name        TEXT,
-    code        TEXT,
-    reference   TEXT,
-    description TEXT,
-    image_url   TEXT,
-    created_at  TIMESTAMP DEFAULT NOW(),
-    updated_at  TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
-    FOREIGN KEY (catalog_id) REFERENCES catalogs  (id) ON DELETE CASCADE
-);
+INSERT INTO items (company_id, factory_id, catalog_id, name, code, reference, description) VALUES (4, 3, 3, 'Naga', 'N1RGB', 'NRGBR', 'Mouse Gamer') RETURNING *;
+INSERT INTO items (company_id, factory_id, catalog_id, name, code, reference, description) VALUES (4, 3, 3, 'Deather', 'D1RGB', 'DABR', 'Mouse Gamer') RETURNING *;
+INSERT INTO items (company_id, factory_id, catalog_id, name, code, reference, description) VALUES (4, 3, 3, 'Monitor 24" 240hz', 'M24240M', 'M24BR', 'Monitor Gamer') RETURNING *;
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+-- Existem 3 items criados pelo representante 3 e que estão visíveis para o representante 4
+-- pois esse tem o acesso ao factory 3 criadora dos items
+INSERT INTO available_catalogs_by_company (catalog_id, company_id) VALUES (4, 3) RETURNING *;
+select * from items where company_id = 4;
+select * from available_factories_by_company;
 
-CREATE TABLE IF NOT EXISTS orders
-(
-    id         SERIAL PRIMARY KEY,
-    company_id INT,
-    costumer_id INT,
-    factory_id INT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (company_id)  REFERENCES companies (id) ON DELETE CASCADE,
-    FOREIGN KEY (costumer_id) REFERENCES costumers (id) ON DELETE CASCADE,
-    FOREIGN KEY (factory_id)  REFERENCES factories (id) ON DELETE CASCADE
-);
+SELECT i.id,
+       f.id             AS catalog_id,
+       i.name           AS catalog_name,
+       f.name           AS factory_name,
+       f.company_id     AS f_company_id,
+       i.company_id     AS c_company_id
+FROM items i
+         JOIN factories f ON i.factory_id = f.id
+WHERE i.company_id IN (
+    SELECT a.factory_id FROM available_factories_by_company a WHERE a.company_id = 3
+)
+   OR i.company_id = 4;
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+-- Rascunho para testar outros usuários
+INSERT INTO items (company_id, factory_id, catalog_id, name, code, reference, description) VALUES (3, 3, 3, 'Naga', 'N1RGB', 'NRGBR', 'Mouse Gamer') RETURNING *;
+INSERT INTO items (company_id, factory_id, catalog_id, name, code, reference, description) VALUES (3, 3, 3, 'Deather', 'D1RGB', 'DABR', 'Mouse Gamer') RETURNING *;
+INSERT INTO items (company_id, factory_id, catalog_id, name, code, reference, description) VALUES (3, 3, 3, 'Monitor 24" 240hz', 'M24240M', 'M24BR', 'Monitor Gamer') RETURNING *;
+INSERT INTO item_prices (company_id, item_id, price, ipi) VALUES (3, 10, 1, 5) RETURNING *;
+INSERT INTO item_prices (company_id, item_id, price, ipi) VALUES (3, 11, 233.99, 5) RETURNING *;
+INSERT INTO item_prices (company_id, item_id, price, ipi) VALUES (3, 12, 9653, 5) RETURNING *;
+INSERT INTO costumers (company_id, name, telephone, email) VALUES (3, 'Hiperer LTDA', '333333', 'hiperer@hip.com') RETURNING *;
+INSERT INTO orders (company_id, costumer_id, factory_id) VALUES (3, 2, 3) RETURNING *;
+INSERT INTO order_items (company_id, order_id, item_id, quantity) VALUES (3, 2, 10, 10) RETURNING *;
+INSERT INTO order_items (company_id, order_id, item_id, quantity) VALUES (3, 2, 11, 5) RETURNING *;
+INSERT INTO order_items (company_id, order_id, item_id, quantity) VALUES (3, 2, 12, 3) RETURNING *;
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+-- O cliente Ajex foi criado pelo representante 4 que possuí visibilidade dos items da factory 3 'Razer'
+INSERT INTO costumers (company_id, name, telephone, email) VALUES (4, 'Ajex LTDA', '12344312', 'ajex@gg.com') RETURNING *;
+select * from costumers;
 
-CREATE TABLE IF NOT EXISTS order_items
-(
-    order_id INT,
-    item_id  INT,
-    company_id INT,
-    quantity INT,
-    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
-    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
-);
+INSERT INTO orders (company_id, costumer_id, factory_id) VALUES (4, 1, 3) RETURNING *;
+select * from orders;
 
-CREATE TABLE IF NOT EXISTS items_price
-(
-    item_id  INT,
-    company_id INT,
-    price DECIMAL(10, 2),
-    ipi INT,
-    FOREIGN KEY (item_id)    REFERENCES items (id)     ON DELETE CASCADE,
-    FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
-);
+INSERT INTO order_items (company_id, order_id, item_id, quantity) VALUES (4, 1, 7, 10) RETURNING *;
+INSERT INTO order_items (company_id, order_id, item_id, quantity) VALUES (4, 1, 8, 5) RETURNING *;
+INSERT INTO order_items (company_id, order_id, item_id, quantity) VALUES (4, 1, 9, 3) RETURNING *;
 
-select *
-from companies;
-INSERT INTO companies (created_at, updated_at) VALUES (created_at, updated_at)
-RETURNING *;
+select * from order_items;
 
-select *
-from user_companies;
-INSERT INTO user_companies (company_id)
-VALUES (1);
-
-select *
-from users;
-INSERT INTO users (name, login, password, email)
-VALUES ('gabriel', 'gabrieler', '123', 'gabriel@gmail')
-RETURNING *;
-
-
-select *
-from factories;
-INSERT INTO factories (company_id)
-VALUES (1);
-
-select *
-from catalog;
-INSERT INTO catalog (factory_id, name, year, month)
-VALUES (1, 'tubos', NOW(), NOW())
-RETURNING *;
-INSERT INTO catalog (factory_id, name, year, month)
-VALUES (1, 'GOD', NOW(), NOW())
-RETURNING *;
-INSERT INTO catalog (factory_id, name, year, month)
-VALUES (1, 'ATE', NOW(), NOW())
-RETURNING *;
-
-select *
-from item;
-INSERT INTO item (catalog_id, name, code, reference, description)
-VALUES (2, 'X', 'L1', 'LX1', 'É L')
-RETURNING *;
-
-INSERT INTO item (catalog_id, name, code, reference, description)
-VALUES (3, 'Y', 'B1', 'BX1', 'O B')
-RETURNING *;
-
-INSERT INTO item (catalog_id, name, code, reference, description)
-VALUES (2, 'w', 'C1', 'CX1', 'P L')
-RETURNING *;
-
-select *
-from orders;
-INSERT INTO orders (factory_id)
-VALUES (1)
-RETURNING *;
-
-select *
-from order_item;
-INSERT INTO order_item (order_id, item_id, quantity)
-VALUES (1, 1, 10)
-RETURNING *;
-INSERT INTO order_item (order_id, item_id, quantity)
-VALUES (1, 2, 10)
-RETURNING *;
-INSERT INTO order_item (order_id, item_id, quantity)
-VALUES (1, 3, 10)
-RETURNING *;
-
--- GetFactoryItems
-select i.id, i.name as item_name, c.name as catalog_name, c2.name company_name
-from item i
-         join catalog c on c.id = i.catalog_id
-         join factory f on f.id = c.factory_id
-         join companies c2 on c2.id = f.company_id
-WHERE c.id = 2;
-
-
--- GetOrderInfo
-SELECT o.id, c2.name AS factory_name, c.name catalog_name, i.name AS item_name, oi.quantity
-FROM orders AS o
-         JOIN factory f ON f.id = o.factory_id
-         join companies c2 on c2.id = f.company_id
-         JOIN order_item oi ON o.id = oi.order_id
-         JOIN item i ON oi.item_id = i.id
-         JOIN catalog c ON c.id = i.catalog_id
-WHERE o.id = 1;
+SELECT DISTINCT
+       i.id,
+       c2.id  AS company,
+       i.name AS product,
+       c.name AS catalog,
+       f.name AS factory,
+       ip.price,
+       oi.quantity,
+       ip.ipi
+FROM order_items oi
+    JOIN item_prices ip ON  ip.item_id    = oi.item_id
+    JOIN items i        ON  i.id          = ip.item_id
+    JOIN catalogs c     ON  c.id          = i.catalog_id
+    JOIN factories f    ON  f.id          = c.factory_id
+    JOIN companies c2   ON  oi.company_id = c2.id
+WHERE oi.company_id = 4 AND oi.order_id = 1;
