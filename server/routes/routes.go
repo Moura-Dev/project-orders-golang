@@ -14,6 +14,10 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 
 	router.Use(cors.New(config))
 
+	mockController := controllers.NewMockController()
+
+	controller := controllers.NewController()
+
 	main := router.Group("api/")
 	main.POST("/login", controllers.Login)
 	main.POST("/user", controllers.CreateUser)
@@ -21,10 +25,10 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 		routers := main.Group("/")
 		routers.Use(cors.New(config))
 		{
-			routers.GET("/", controllers.HellowControllers)
-			routers.POST("/seller", controllers.CreateSeller)
-			routers.GET("/seller/:id", controllers.GetSellerById)
-			routers.GET("/seller", controllers.GetAllSellers)
+			routers.GET("/", controller.HellowControllers)
+			routers.POST("/seller", mockController.CreateSeller)
+			routers.GET("/seller/:id", mockController.GetSellerById)
+			routers.GET("/seller", mockController.GetAllSellers)
 			routers.DELETE("/seller/:id", controllers.DeleteSeller)
 			routers.GET("/user", controllers.GetUserInfo)
 			routers.GET("/company", mockController.GetAllCompany)

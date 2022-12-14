@@ -55,7 +55,7 @@ func GetUserInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func CreateSeller(ctx *gin.Context) {
+func (c *Controller) CreateSeller(ctx *gin.Context) {
 	var seller models.Seller
 
 	if err := ctx.ShouldBindJSON(&seller); err != nil {
