@@ -127,15 +127,18 @@ func GetProductByID(ctx *gin.Context) {
 }
 
 func GetAllProducts(ctx *gin.Context) {
-	token := ctx.Request.Header.Get("authorization")
-	token = token[7:]
-	userId, err := services.NewJWTService().GetUserIdFromToken(token)
-	if err != nil {
-		ctx.JSON(401, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	//token := ctx.Request.Header.Get("authorization")
+	//
+	//token = token[7:]
+	//userId, err := services.NewJWTService().GetUserIdFromToken(token)
+	userId := "8"
+
+	//if err != nil {
+	//	ctx.JSON(401, gin.H{
+	//		"error": err.Error(),
+	//	})
+	//	return
+	//}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

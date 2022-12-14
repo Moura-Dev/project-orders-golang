@@ -2,7 +2,6 @@ package routes
 
 import (
 	"base-project-api/controllers"
-	middlewares "base-project-api/server/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +18,8 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 	main.POST("/login", controllers.Login)
 	main.POST("/user", controllers.CreateUser)
 	{
-		routers := main.Group("/", middlewares.AuthJwt())
+		routers := main.Group("/")
+		routers.Use(cors.New(config))
 		{
 			routers.GET("/", controllers.HellowControllers)
 			routers.POST("/seller", controllers.CreateSeller)
@@ -27,7 +27,7 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 			routers.GET("/seller", controllers.GetAllSellers)
 			routers.DELETE("/seller/:id", controllers.DeleteSeller)
 			routers.GET("/user", controllers.GetUserInfo)
-			routers.GET("/company", controllers.GetAllCompany)
+			routers.GET("/company", mockController.GetAllCompany)
 			routers.POST("/company", controllers.CreateCompany)
 			routers.DELETE("/company/:id", controllers.DeleteCompany)
 			routers.PUT("/company/", controllers.UpdateCompany)
