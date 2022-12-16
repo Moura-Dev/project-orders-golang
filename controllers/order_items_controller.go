@@ -51,7 +51,7 @@ func DeleteOrderItems(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "Item deleted successfully")
+	ctx.JSON(http.StatusOK, "Product deleted successfully")
 }
 
 func GetAllItemsInOrder(ctx *gin.Context) {

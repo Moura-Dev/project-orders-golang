@@ -4,6 +4,6 @@ import "github.com/gin-gonic/gin"
 
 func (c *Controller) HellowControllers(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
-		"message": "Hello World!",
+		"data": "Hello World!",
 	})
 }
