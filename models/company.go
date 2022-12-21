@@ -16,6 +16,7 @@ type Company struct {
 	City        string `json:"city"`
 	State       string `json:"state"`
 	Zipcode     string `json:"zipcode"`
+	Plan        int32  `json:"plan"`
 	CreateAt    string `json:"create_at"`
 	UpdateAt    string `json:"update_at"`
 }
