@@ -45,6 +45,7 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 			routers.GET("/portages", mockController.GetAllPortages)
 			routers.GET("/portage/:id", mockController.GetPortageByID)
 			routers.GET("/factories", mockController.GetAllFactories)
+			routers.GET("/factories", mockController.GetFactoryByID)
 			//routers.POST("/company", controllers.CreateCompany)
 			//routers.DELETE("/company/:id", controllers.DeleteCompany)
 			//routers.PUT("/company/", controllers.UpdateCompany)

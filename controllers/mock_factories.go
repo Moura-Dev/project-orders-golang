@@ -9,9 +9,9 @@ func (mc *MockController) GetFactoryByID(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"data": models.Factory{
 			ID:          1,
-			Email:       "teste@test.com.br",
-			Name:        "teste",
-			FantasyName: "teste",
+			Email:       "Andaluz@test.com.br",
+			Name:        "Andaluz",
+			FantasyName: "Andaluz",
 			CPFCNPJ:     "123456789",
 			IE:          "123456789",
 			Phone:       "123456789",
