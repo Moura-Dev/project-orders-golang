@@ -15,7 +15,7 @@ type Factory struct {
 	City        string `json:"city"`
 	State       string `json:"state"`
 	Zipcode     string `json:"zipcode"`
-	commission  string `json:"commission"`
+	Commission  string `json:"commission"`
 	CreateAt    string `json:"create_at"`
 	UpdateAt    string `json:"update_at"`
 }
