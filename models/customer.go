@@ -15,6 +15,7 @@ type Customer struct {
 	City        string `json:"city"`
 	State       string `json:"state"`
 	Zipcode     string `json:"zipcode"`
+	IsActive    bool   `json:"is_active"`
 	CreateAt    string `json:"create_at"`
 	UpdateAt    string `json:"update_at"`
 }

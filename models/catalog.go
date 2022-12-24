@@ -5,6 +5,7 @@ type Catalog struct {
 	CompanyID   int32  `json:"company_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	IsActive    bool   `json:"is_active"`
 	CreateAt    string `json:"create_at"`
 	UpdateAt    string `json:"update_at"`
 }

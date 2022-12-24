@@ -13,6 +13,7 @@ type Product struct {
 	Reference   string `json:"reference"`
 	Description string `json:"description"`
 	ImageURL    string `json:"image"`
+	IsActive    bool   `json:"is_active"`
 	CreateAt    string `json:"create_at"`
 	UpdateAt    string `json:"update_at"`
 }
@@ -35,7 +36,6 @@ type CreateItem struct {
 
 type UpdateItem struct {
 	ID          int32           `json:"id"`
-	CompanyID   int32           `json:"company_id"`
 	FactoryID   int32           `json:"factory_id"`
 	CatalogID   int32           `json:"catalog_id"`
 	Name        string          `json:"name"`

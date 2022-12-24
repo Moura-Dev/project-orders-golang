@@ -6,6 +6,7 @@ type OrderItem struct {
 	ProductID int32  `json:"product_id"`
 	Quantity  int32  `json:"quantity"`
 	Price     int32  `json:"price"`
+	IsActive  bool   `json:"is_active"`
 	CreateAt  string `json:"create_at"`
 	UpdateAt  string `json:"update_at"`
 }
@@ -23,7 +24,6 @@ type CreateOrderItem struct {
 
 type UpdateOrderItem struct {
 	ID        int32 `json:"id"`
-	OrderID   int32 `json:"order_id"`
 	ProductID int32 `json:"product_id"`
 	Quantity  int32 `json:"quantity"`
 	Price     int32 `json:"price"`

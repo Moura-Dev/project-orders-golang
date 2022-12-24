@@ -1,6 +1,6 @@
 package models
 
-type Shipp struct {
+type Portage struct {
 	ID          int32  `json:"id"`
 	Email       string `json:"email"`
 	Name        string `json:"name"`
@@ -15,6 +15,7 @@ type Shipp struct {
 	City        string `json:"city"`
 	State       string `json:"state"`
 	Zipcode     string `json:"zipcode"`
+	IsActive    bool   `json:"is_active"`
 	CreateAt    string `json:"create_at"`
 	UpdateAt    string `json:"update_at"`
 }
