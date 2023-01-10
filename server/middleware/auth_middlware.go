@@ -1,30 +1,53 @@
-package middlewares
+package middleware
 
 import (
-	"base-project-api/services"
+	"base-project-api/services/token"
+	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func AuthJwt() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		// Get the client secret key
-		authorization := ctx.GetHeader("Authorization")
-		if authorization == "" {
-			ctx.JSON(401, gin.H{
-				"message": "Token not found",
-			})
-			ctx.AbortWithStatus(401)
-			return
-		}
-		token := authorization[7:]
+const (
+	authorizationHeaderKey  = "authorization"
+	authorizationTypeBearer = "bearer"
+	authorizationPayloadKey = "authorization_payload"
+)
 
-		if !services.NewJWTService().ValidateToken(token) {
-			ctx.JSON(401, gin.H{
-				"message": "Invalid token",
-			})
-			ctx.AbortWithStatus(401)
+func AuthMiddlewarePasseto(tokenMaker token.Maker) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
+
+		if len(authorizationHeader) == 0 {
+			err := errors.New("authorization header is not provided")
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return
 		}
+
+		fields := strings.Fields(authorizationHeader)
+		if len(fields) < 2 {
+			err := errors.New("invalid authorization header format")
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		authorizationType := strings.ToLower(fields[0])
+		if authorizationType != authorizationTypeBearer {
+			err := fmt.Errorf("unsupported authorization type %s", authorizationType)
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		accessToken := fields[1]
+		payload, err := tokenMaker.VerifyToken(accessToken)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		ctx.Set(authorizationPayloadKey, payload)
+		ctx.Next()
 	}
 }
