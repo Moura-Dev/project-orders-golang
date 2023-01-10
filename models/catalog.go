@@ -3,6 +3,7 @@ package models
 type Catalog struct {
 	ID          int32  `json:"id"`
 	CompanyID   int32  `json:"company_id"`
+	FactoryID   int32  `json:"factory_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	IsActive    bool   `json:"is_active"`

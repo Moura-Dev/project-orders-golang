@@ -10,7 +10,7 @@ type Portage struct {
 	Phone       string `json:"phone"`
 	Website     string `json:"website"`
 	LogoURL     string `json:"logo"`
-	Steet       string `json:"steet"`
+	Street      string `json:"street"`
 	Number      string `json:"number"`
 	City        string `json:"city"`
 	State       string `json:"state"`
