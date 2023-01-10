@@ -1,15 +1,15 @@
 package controllers
 
-//
-//import (
-//	"base-project-api/models"
-//	"base-project-api/repository"
-//	"base-project-api/services"
-//	"github.com/gin-gonic/gin"
-//	"net/http"
-//	"strconv"
-//)
-//
+import (
+	"base-project-api/models"
+	"base-project-api/repository"
+	"base-project-api/services"
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"os"
+	"time"
+)
+
 //func CreateUser(ctx *gin.Context) {
 //	var user models.User
 //	user.Password = services.SHA256ENCODER(user.Password)
@@ -147,36 +147,72 @@ package controllers
 //
 //	ctx.JSON(http.StatusOK, "Deleted Successfully")
 //}
-//
-//func Login(ctx *gin.Context) { // Get User in db
-//	data := models.User{}
-//	if err := ctx.ShouldBindJSON(&data); err != nil {
-//		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-//		return
-//	}
-//	user, err := repository.GetUser(data.Login)
-//	if err != nil {
-//		ctx.JSON(400, gin.H{
-//			"error": "user not found",
-//		})
-//		return
-//	}
-//
-//	if user.Password != services.SHA256ENCODER(data.Password) {
-//		ctx.JSON(401, gin.H{
-//			"error": "invalid credentials",
-//		})
-//		return
-//	}
-//	token, err := services.NewJWTService().GenerateToken(int(user.ID))
-//	if err != nil {
-//		ctx.JSON(500, gin.H{
-//			"error": err.Error(),
-//		})
-//		return
-//	}
-//
-//	ctx.JSON(200, gin.H{
-//		"access_token": token,
-//	})
-//}
+
+func (t Token) LoginUser(ctx *gin.Context) { // Get User in db
+	data := models.LoginUserRequest{}
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	user, err := repository.GetUser(data.Email)
+	if err != nil {
+		ctx.JSON(400, gin.H{
+			"error": "user not found",
+		})
+		return
+	}
+
+	if user.Password != services.SHA256ENCODER(data.Password) {
+		ctx.JSON(401, gin.H{
+			"error": "invalid credentials",
+		})
+		return
+	}
+	TokenDurationStr := os.Getenv("AccessTokenDuration")
+	accessTokenDuration, _ := time.ParseDuration(TokenDurationStr)
+	accessToken, accessPayload, _ := t.tokenMaker.CreateToken(
+		user.Email,
+		accessTokenDuration,
+	)
+
+	refreshTokenDurationStr := os.Getenv("AccessTokenDuration")
+	refreshTokenDuration, _ := time.ParseDuration(refreshTokenDurationStr)
+	refreshToken, refreshPayload, err := t.tokenMaker.CreateToken(
+		user.Email,
+		refreshTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	//create ID           uuid.UUID
+	//	Email        string
+	//	RefreshToken string
+	//	UserAgent    string
+	//	ClientIp     string
+	//	IsBlocked    bool
+	//	ExpiresAt    time.Time
+	session := models.CreateSessionParams{
+		Email:        user.Email,
+		RefreshToken: refreshToken,
+		UserAgent:    ctx.Request.UserAgent(),
+		ClientIp:     ctx.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    time.Now().Add(time.Hour * 24),
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	rsp := models.LoginUserResponse{
+		SessionID:             session.ID,
+		AccessToken:           accessToken,
+		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
+		RefreshToken:          refreshToken,
+		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
+		User:                  models.UserResponse{ID: user.ID, Email: user.Email},
+	}
+	ctx.JSON(http.StatusOK, rsp)
+}

@@ -15,8 +15,8 @@ package repository
 //
 //	return user, nil
 //}
-//func GetUserInfo(userID int) (models.User, error) {
-//	user := models.User{}
+//func GetUserInfo(userID int) (models.Company, error) {
+//	user := models.Company{}
 //	err := db.Conn.Get(&user, "SELECT * FROM users WHERE id = $1", userID)
 //	if err != nil {
 //		return user, err
@@ -25,9 +25,9 @@ package repository
 //	return user, nil
 //}
 //
-//func GetUser(login string) (models.User, error) {
-//	user := models.User{}
-//	err := db.Conn.Get(&user, "SELECT * FROM users WHERE login = $1", login)
+//func GetUser(email string) (models.Company, error) {
+//	user := models.Company{}
+//	err := db.Conn.Get(&user, "SELECT * FROM companies WHERE email = $1", email)
 //	if err != nil {
 //		return user, err
 //	}
